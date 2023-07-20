@@ -24,11 +24,6 @@ Last Updated : 2023-07-20
 - Considerations
 - Metrics
 
-## Links
-
-- [A link](#)
-- [Another link](#)
-
 ## Objective
 
 _What and why are we doing this?_
@@ -40,7 +35,7 @@ It's a technical challenge for iVentas. The goal is to create a frontend applica
 ## Goals
 
 - Create a front end web app where we can send the message
-- Create the backend app to create the server to manage the requests
+- Create the backend app to manage the incoming requests
 
 ## Non-Goals
 
@@ -56,7 +51,6 @@ to create a chat that allows us the communication between the client and our TI 
 We need an API to allow us open a conection with the client, listen the incomming messages in
 the server side, save the message in the data base, send a message back to the client.
 
-![overview](./docs/overview.png)
 
 We need to use an API that helps us in the development stage. Out there are several APIS who could help us such as 
 
@@ -64,25 +58,20 @@ We need to use an API that helps us in the development stage. Out there are seve
  - [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
  - [Pusher](https://pusher.com/docs/channels/server_api/overview/?ref=docs-index)
 
-
-
 _High-level overview of your proposal_
 
-_This section should be understandable by new employees on your team
-that is not related to the project_
 
-_Put details in the next section.
+You could find more detailed docs. 
+
+- Frontend.
+    [ChatVentas](./front/README.md)
+
+- Backend.
+    [API](./back/README.md)
 
 ## Detailed Design 
-_Use diagrams where necessary._
 
-_Tools like [Excalidraw](#) are good resources for this._
-
-_Cover major changes:_
-_-What are the new functions that you will write?_
-_-Why do you need new components?_
-_-Is there any code that can be reusable?_
-_Don't elaborate deeply on the implementation details._
+![overview](./docs/overview.png)
 
 ## Solution 1
 FrontEnd
