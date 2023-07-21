@@ -1,4 +1,5 @@
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
+import AddNewMessage from "./assets/components/Message/AddNewMessage";
 
 function App() {
   const messages = [
@@ -18,6 +19,9 @@ function App() {
 
     }
   ]
+  const handleSend = (message: string) => {
+    console.log(message)
+  }
 
   return (
     <AppContainer>
@@ -28,6 +32,7 @@ function App() {
           </MessagesContainer>
         ))
       }
+      <AddNewMessage onSend={handleSend} />
 
     </AppContainer>
   )
