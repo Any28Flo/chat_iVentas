@@ -1,31 +1,14 @@
-import path from "path";
-import dotenv from "dotenv";
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
+const dotenv_1 = __importDefault(require("dotenv"));
 // Parsing the env file.
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
-
-
-interface ENV {
-    PORT: number | undefined;
-    APP_ID: string | undefined;
-    KEY: string | undefined;
-    SECRET: string | undefined;
-    CLUSTER: string | undefined;
-}
-
-interface Config {
-
-    PORT: number;
-    APP_ID: string;
-    KEY: string;
-    SECRET: string;
-    CLUSTER: string;
-
-}
-
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, "../.env") });
 // Loading process.env as ENV interface
-
-const getConfig = (): ENV => {
+const getConfig = () => {
     return {
         PORT: process.env.PORT ? Number(process.env.PORT) : 3003,
         APP_ID: process.env.APP_ID ? String(process.env.APP_ID) : undefined,
@@ -34,25 +17,19 @@ const getConfig = (): ENV => {
         CLUSTER: process.env.CLUSTER ? String(process.env.CLUSTER) : undefined,
     };
 };
-
 // Throwing an Error if any field was undefined we don't 
 // want our app to run if it can't connect to DB and ensure 
 // that these fields are accessible. If all is good return
 // it as Config which just removes the undefined from our type 
 // definition.
-
-const getSanitizedConfig = (config: ENV): Config => {
+const getSanitizedConfig = (config) => {
     for (const [key, value] of Object.entries(config)) {
         if (value === undefined) {
             throw new Error(`Missing key ${key} in config.env`);
         }
     }
-    return config as Config;
+    return config;
 };
-
 const config = getConfig();
-
 const sanitizedConfig = getSanitizedConfig(config);
-
-export default sanitizedConfig;
-
+exports.default = sanitizedConfig;
