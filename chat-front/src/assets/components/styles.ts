@@ -8,7 +8,7 @@ export const AppContainer = styled.div`
     padding :2rem;
     background-color: var(--primary);
 `;
-export const RowContainer = styled.div`
+export const MessagesContainer = styled.div`
     background-color: red;
     width: 300px;
     min-height:40px;

@@ -1,4 +1,4 @@
-import { AppContainer, RowContainer } from "./assets/components/styles";
+import { AppContainer, MessagesContainer } from "./assets/components/styles";
 
 function App() {
   const messages = [
@@ -23,9 +23,9 @@ function App() {
     <AppContainer>
       {
         messages.map(({ id, message }) => (
-          <RowContainer key={id}>
+          <MessagesContainer key={id}>
             {message}
-          </RowContainer>
+          </MessagesContainer>
         ))
       }
 
