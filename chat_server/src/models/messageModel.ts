@@ -3,7 +3,9 @@ interface Message {
     content: string;
     timestamp: string;
 }
+
 const messages: Message[] = [];
+
 
 const sendMessage = (content: string): Message => {
     const timestamp = new Date().toISOString();
@@ -19,5 +21,7 @@ const sendMessage = (content: string): Message => {
 };
 
 export {
-    sendMessage
+    messages,
+    sendMessage,
+    Message
 }

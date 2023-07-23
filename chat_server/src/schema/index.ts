@@ -1,11 +1,3 @@
 import { buildSchema } from "graphql";
+import { sendMessage } from "../models/messageModel";
 
-const schema = buildSchema(`
-  type Query {
-    hello: String
-  }
-`)
-
-export {
-    schema
-}
