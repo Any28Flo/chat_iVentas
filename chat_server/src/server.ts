@@ -1,9 +1,10 @@
-import app from './app';
-import config from './config';
+import express from "express";
+import { buildApp } from './app';
 
+const app = express();
 
-const PORT: number = config.PORT;
+const endpoint = buildApp(app);
 
-app.listen(PORT, () => {
-    console.log('SERVER IS UP ON PORT:', PORT);
-})
+app.listen(4000, () => {
+    console.log(`GraphQL API located at http://localhost:4000${endpoint}`);
+});
