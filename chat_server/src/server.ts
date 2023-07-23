@@ -1,10 +1,8 @@
-import express from "express";
-import { buildApp } from './app';
+import { createServer } from 'node:http'
+import yoga from './app';
 
-const app = express();
+const server = createServer(yoga)
 
-const endpoint = buildApp(app);
-
-app.listen(4000, () => {
-    console.log(`GraphQL API located at http://localhost:4000${endpoint}`);
-});
+server.listen(4000, () => {
+    console.info('Server is running on http://localhost:4000/graphql')
+})

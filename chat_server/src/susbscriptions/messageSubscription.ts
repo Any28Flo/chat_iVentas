@@ -3,7 +3,7 @@
 
 import { Request, Response } from "express";
 import Pusher from 'pusher';
-import config from "../config";
+import config from "../utils/config";
 
 const pusher = new Pusher({
     appId: config.APP_ID,

@@ -1,45 +1,47 @@
-import express from 'express'
-import { createSchema, createYoga } from 'graphql-yoga'
+import { createYoga, createSchema } from 'graphql-yoga'
+import { pusher } from './utils/pusher';
 
-export function buildApp(app: ReturnType<typeof express>) {
+import typeDefs from './schemas';
+import { chats } from './resolvers';
 
-  const graphQLServer = createYoga({
-    schema: createSchema({
-      typeDefs: /* GraphQL */ `
-        scalar File
-        type Query {
-          hello: String
+const yoga = createYoga({
+  schema: createSchema({
+    typeDefs: typeDefs,
+    resolvers: {
+      Query: {
+        chats(root, args, context) {
+          return chats
         }
-        type Mutation {
-          getFileName(file: File!): String
-        }
-        type Subscription {
-          countdown(from: Int!): Int!
-        }
-      `,
-      resolvers: {
-        Query: {
-          hello: () => 'world',
-        },
-        Mutation: {
-          getFileName: (root, { file }: { file: File }) => file.name,
-        },
-        Subscription: {
-          countdown: {
-            async *subscribe(_, { from }) {
-              for (let i = from; i >= 0; i--) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                yield { countdown: i };
-              }
-            },
-          },
-        },
+
       },
-    }),
-    logging: false,
-  });
+      Mutation: {
+        sendMessage(root, { from, message }, { pubsub }) {
+          const chat = { id: chats.length + 1, from, message }
 
-  app.use(graphQLServer.graphqlEndpoint, graphQLServer);
+          chats.push(chat)
 
-  return graphQLServer.graphqlEndpoint;
-}
+          // Trigger a 'messageSent' event to all subscribers
+          pusher.trigger('my-channel', 'messageSent', {
+            message,
+          });
+          return chat
+        }
+      },
+      Subscription: {
+        messageSent: {
+          subscribe: (root, args, { pubsub }) => {
+            //  return pubsub.asyncIterator(CHAT_CHANNEL)
+          }
+        }
+      }
+
+    }
+
+  }),
+  context() {
+    return { currentUser: 13 }
+  }
+})
+
+
+export default yoga
