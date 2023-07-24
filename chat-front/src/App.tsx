@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { useQuery, gql } from '@apollo/client';
 
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
