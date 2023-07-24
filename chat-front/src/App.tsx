@@ -1,38 +1,51 @@
+import { useState } from "react";
+
+import { useQuery, gql } from '@apollo/client';
+
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
 import AddNewMessage from "./assets/components/Message/AddNewMessage";
 
+interface Message {
+  message: string
+  id: number,
+  from: string
+}
 function App() {
-  const messages = [
-    {
-      id: 1,
-      message: 'hello'
 
-    },
-    {
-      id: 2,
-      message: 'nice'
-
-    },
-    {
-      id: 3,
-      message: 'meet you'
+  const GET_MESSAGES = gql`
+  query GetChats {
+    chats{
+      id,
+      from,
+      message
 
     }
-  ]
-  const handleSend = (message: string) => {
-    console.log(message)
   }
+`;
+  const { loading, error, data } = useQuery(GET_MESSAGES);
+
+  const handleMessageSend = (message: string) => {
+    let newMessage = {
+      from: 'Daedra',
+      message: message
+    }
+    console.log(newMessage);
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error : {error.message}</p>;
 
   return (
     <AppContainer>
+
       {
-        messages.map(({ id, message }) => (
+        data.chats.map(({ id, message }: Message) => (
           <MessagesContainer key={id}>
             {message}
           </MessagesContainer>
         ))
       }
-      <AddNewMessage onSend={handleSend} />
+      <AddNewMessage onSend={handleMessageSend} />
 
     </AppContainer>
   )

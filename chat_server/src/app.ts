@@ -1,17 +1,43 @@
 import { createYoga, createSchema } from 'graphql-yoga'
 import { pusher } from './utils/pusher';
 
-import typeDefs from './schemas';
-import { chats } from './resolvers';
+interface Message {
+  message: string
+  id: number,
+  from: string
+}
+
+export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+
 
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs: typeDefs,
+    typeDefs: `
+    type Chat {
+      id: Int!
+      from: String!
+      message: String!
+    }
+  
+    type Query {
+      chats: [Chat]
+    }
+  
+    type Mutation {
+      sendMessage(from: String!, message: String!): Chat
+    }
+    
+    type Subscription {
+      messageSent: Chat
+    }
+  
+    `,
     resolvers: {
       Query: {
-        chats(root, args, context) {
+        chats(_, __, context) {
           return chats
         }
+
 
       },
       Mutation: {
@@ -36,7 +62,6 @@ const yoga = createYoga({
       }
 
     }
-
   }),
   context() {
     return { currentUser: 13 }
