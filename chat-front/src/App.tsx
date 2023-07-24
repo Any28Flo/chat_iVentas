@@ -16,7 +16,6 @@ function App() {
       id,
       from,
       message
-
     }
   }
 `;
