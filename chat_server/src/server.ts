@@ -1,9 +1,8 @@
-import app from './app';
-import config from './config';
+import { createServer } from 'node:http'
+import yoga from './app';
 
+const server = createServer(yoga)
 
-const PORT: number = config.PORT;
-
-app.listen(PORT, () => {
-    console.log('SERVER IS UP ON PORT:', PORT);
+server.listen(4000, () => {
+    console.info('Server is running on http://localhost:4000/graphql')
 })

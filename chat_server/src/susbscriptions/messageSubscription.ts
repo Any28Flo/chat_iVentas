@@ -3,7 +3,7 @@
 
 import { Request, Response } from "express";
 import Pusher from 'pusher';
-import config from "../config";
+import config from "../utils/config";
 
 const pusher = new Pusher({
     appId: config.APP_ID,
@@ -14,15 +14,3 @@ const pusher = new Pusher({
 });
 
 export { pusher }
-
-const postMessage = (req: Request, res: Response) => {
-    const { username, message } = req.body;
-
-    // Trigger a new message event on Pusher
-    pusher.trigger('chat', 'message', {
-        username,
-        message,
-    });
-
-    res.status(200).json({ success: true });
-};

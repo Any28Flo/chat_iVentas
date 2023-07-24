@@ -1,21 +1,47 @@
-import express from "express";
-import { graphqlHTTP } from "express-graphql";
-import { schema } from "./schema";
-const app = express();
+import { createYoga, createSchema } from 'graphql-yoga'
+import { pusher } from './utils/pusher';
 
-// The root provides a resolver function for each API endpoint
-const root = {
-    hello: () => {
-        return "Chat server test endpoint"
-    },
-}
-app.use(
-    "/graphql",
-    graphqlHTTP({
-        schema: schema,
-        rootValue: root,
-        graphiql: true,
-    })
-)
+import typeDefs from './schemas';
+import { chats } from './resolvers';
 
-export default app;
+const yoga = createYoga({
+  schema: createSchema({
+    typeDefs: typeDefs,
+    resolvers: {
+      Query: {
+        chats(root, args, context) {
+          return chats
+        }
+
+      },
+      Mutation: {
+        sendMessage(root, { from, message }, { pubsub }) {
+          const chat = { id: chats.length + 1, from, message }
+
+          chats.push(chat)
+
+          // Trigger a 'messageSent' event to all subscribers
+          pusher.trigger('my-channel', 'messageSent', {
+            message,
+          });
+          return chat
+        }
+      },
+      Subscription: {
+        messageSent: {
+          subscribe: (root, args, { pubsub }) => {
+
+          }
+        }
+      }
+
+    }
+
+  }),
+  context() {
+    return { currentUser: 13 }
+  }
+})
+
+
+export default yoga
