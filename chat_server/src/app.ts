@@ -1,4 +1,6 @@
-import { createYoga, createSchema } from 'graphql-yoga'
+import { createYoga, createSchema, createPubSub } from 'graphql-yoga'
+
+
 import { pusher } from './utils/pusher';
 
 interface Message {
@@ -8,6 +10,12 @@ interface Message {
 }
 
 export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+const CHAT_CHANNEL = "CHAT_CHANNEL";
+
+
+const pubSub = createPubSub<{
+  newMessage: [payload: { from: string, message: string }]
+}>();
 
 
 const yoga = createYoga({
@@ -41,7 +49,7 @@ const yoga = createYoga({
 
       },
       Mutation: {
-        sendMessage(root, { from, message }, { pubsub }) {
+        sendMessage(_, { from, message }, { pubSub }) {
           const chat = { id: chats.length + 1, from, message }
 
           chats.push(chat)
@@ -50,21 +58,26 @@ const yoga = createYoga({
           pusher.trigger('my-channel', 'messageSent', {
             message,
           });
+          pubSub.publish('CHAT_CHANNEL', { messageSent: chat })
+
           return chat
         }
       },
       Subscription: {
-        messageSent: {
-          subscribe: (root, args, { pubsub }) => {
+        newMessage: {
+          subscribe: (_, { from, message, id }, { pubSub }) => {
+            return pubSub.asyncIterator(CHAT_CHANNEL)
 
+            //pubSub.subscribe('sendMessages',{from,message,id} )
           }
         }
+
       }
 
     }
   }),
-  context() {
-    return { currentUser: 13 }
+  context: {
+    pubSub
   }
 })
 
