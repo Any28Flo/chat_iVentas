@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
+import Home from "./assets/components/pages/Home";
 import AddNewMessage from "./assets/components/Message/AddNewMessage";
 import MessagesList from "./assets/components/Message/MessagesList";
 
@@ -41,11 +43,12 @@ function App() {
 
   return (
     <AppContainer>
-      <MessagesContainer>
-        <MessagesList key='message-01' chats={chats}></MessagesList>
-      </MessagesContainer>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </Router>
 
-      <AddNewMessage onSend={handleMessageSend} />
     </AppContainer>
   )
 }
