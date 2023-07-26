@@ -16,7 +16,7 @@ import config from './utils/config';
 
 
 
-mongoose.connect('mongodb+srv://foglzerika:hTWr7bEa6ypLQAIi@cluster0.yjmfi2o.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect(config.MONGODB_URL)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
@@ -53,6 +53,11 @@ const yoga = createYoga({
           const { username, phone, email, password } = args;
           const user = new UserModel({ username, phone, email, password });
           await user.save();
+          /**
+           * TODO
+           * - Add error handler
+           * 
+           */
           pubSub.publish("newUser", { newUser: user });
           return user;
 
