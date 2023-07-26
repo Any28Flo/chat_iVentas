@@ -1,49 +1,51 @@
-import { useQuery, gql } from '@apollo/client';
+import { useEffect, useState } from "react";
 
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
 import AddNewMessage from "./assets/components/Message/AddNewMessage";
+import MessagesList from "./assets/components/Message/MessagesList";
 
-interface Message {
-  message: string
-  id: number,
-  from: string
-}
+import { pusherClient } from "./assets/utils";
+
+
 function App() {
 
-  const GET_MESSAGES = gql`
-  query GetChats {
-    chats{
-      id,
-      from,
-      message
-    }
-  }
-`;
-  const { loading, error, data } = useQuery(GET_MESSAGES);
+  const [chats, setChats] = useState([]);
 
   const handleMessageSend = (message: string) => {
     let newMessage = {
       from: 'Daedra',
       message: message
     }
-    console.log(newMessage);
-  };
+  }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error : {error.message}</p>;
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe("my-channel");
+    //  console.log(channel)
+    channel.bind('my-event', (data: Message) => {
+      console.log(data);
+      const { from, message } = data
+      setChats((prevState) => [
+        ...prevState,
+        { from, message, }
+
+      ])
+
+    })
+
+    return () => {
+      pusherClient.unsubscribe("my-channel");
+    };
+  }, [])
+
 
   return (
     <AppContainer>
+      <MessagesContainer>
+        <MessagesList key='message-01' chats={chats}></MessagesList>
+      </MessagesContainer>
 
-      {
-        data.chats.map(({ id, message }: Message) => (
-          <MessagesContainer key={id}>
-            {message}
-          </MessagesContainer>
-        ))
-      }
       <AddNewMessage onSend={handleMessageSend} />
-
     </AppContainer>
   )
 }
