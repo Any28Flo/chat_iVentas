@@ -1,4 +1,4 @@
-# Chat front
+# Chat app
 
 author : Erika F.
 
@@ -16,9 +16,9 @@ last update: 26- jun- 2023
 
 ## System Requirements
 
-- [git][git] v2.13 or greater
-- [NodeJS][node] `>=16`
-- [npm][npm] v8.16.0 or greater
+- [git](git) v2.13 or greater
+- [NodeJS](node) `>=16`
+- [npm](npm) v8.16.0 or greater
 
 All of these must be available in your `PATH`. To verify things are set up
 properly, you can run this:
@@ -42,7 +42,7 @@ Hosted on [link](#)
 
 _What and why are we doing this?_
 
-Build a backend realtime application that enable bi-directional communication.
+Build a realtime application that enable bi-directional communication.
 
 ## Goals
 
@@ -62,10 +62,3 @@ Build a backend realtime application that enable bi-directional communication.
 
 - If the initial connection is successful, enable a TCP connection.
 - Kept alive the connection for as long as needed. This way the server could send data. 
-
-## Non-Goals
-
-- Authentication
-- Status of connection
-- Database configuration
-
