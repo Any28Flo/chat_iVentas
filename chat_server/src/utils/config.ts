@@ -11,6 +11,7 @@ interface ENV {
     KEY: string | undefined;
     SECRET: string | undefined;
     CLUSTER: string | undefined;
+    MONGODB_URL: string | undefined;
 }
 
 interface Config {
@@ -20,7 +21,7 @@ interface Config {
     KEY: string;
     SECRET: string;
     CLUSTER: string;
-
+    MONGODB_URL: string
 }
 
 // Loading process.env as ENV interface
@@ -32,6 +33,7 @@ const getConfig = (): ENV => {
         KEY: process.env.KEY ? String(process.env.KEY) : undefined,
         SECRET: process.env.SECRET ? String(process.env.SECRET) : undefined,
         CLUSTER: process.env.CLUSTER ? String(process.env.CLUSTER) : undefined,
+        MONGODB_URL: process.env.MONGODB_URL ? String(process.env.MONGODB_URL) : undefined,
     };
 };
 

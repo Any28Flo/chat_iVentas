@@ -4,6 +4,13 @@ export const typeDefs = `
       from: String!
       message: String!
     }
+    type User {
+      id: ID!
+      username: String!
+      email: String!
+      phone: String!
+      password : String!
+    }
   
     type Query {
       chats: [Chat]
@@ -11,7 +18,7 @@ export const typeDefs = `
     }
     type Mutation{
       sendMessage(from: String!, message: String!): Chat
-
+      createUser(username: String! email: String!,phone: String!, password: String!): User!
     }
     type Subscription {
       countdown(from: Int!): Int!

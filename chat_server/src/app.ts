@@ -1,12 +1,26 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga'
 import { typeDefs } from './types';
 import { pusher, } from './utils/pusher';
+import UserModel from './models/user.model';
+
 interface Message {
   message: string
   id: number,
   from: string
 }
 export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+
+import mongoose from 'mongoose';
+import config from './utils/config';
+
+
+
+
+mongoose.connect('mongodb+srv://foglzerika:hTWr7bEa6ypLQAIi@cluster0.yjmfi2o.mongodb.net/?retryWrites=true&w=majority')
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
+
+
 
 const pubSub = createPubSub();
 
@@ -33,6 +47,14 @@ const yoga = createYoga({
 
           // pubSub.publish('my-channel', { messageSent: chat })
           return chat
+
+        },
+        createUser: async (_, args,) => {
+          const { username, phone, email, password } = args;
+          const user = new UserModel({ username, phone, email, password });
+          await user.save();
+          pubSub.publish("newUser", { newUser: user });
+          return user;
 
         }
       },
