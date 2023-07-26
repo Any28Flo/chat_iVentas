@@ -1,39 +1,51 @@
+import { useEffect, useState } from "react";
+
 import { AppContainer, MessagesContainer } from "./assets/components/styles";
 import AddNewMessage from "./assets/components/Message/AddNewMessage";
+import MessagesList from "./assets/components/Message/MessagesList";
+
+import { pusherClient } from "./assets/utils";
+
 
 function App() {
-  const messages = [
-    {
-      id: 1,
-      message: 'hello'
 
-    },
-    {
-      id: 2,
-      message: 'nice'
+  const [chats, setChats] = useState([]);
 
-    },
-    {
-      id: 3,
-      message: 'meet you'
-
+  const handleMessageSend = (message: string) => {
+    let newMessage = {
+      from: 'Daedra',
+      message: message
     }
-  ]
-  const handleSend = (message: string) => {
-    console.log(message)
   }
+
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe("my-channel");
+    //  console.log(channel)
+    channel.bind('my-event', (data: Message) => {
+      console.log(data);
+      const { from, message } = data
+      setChats((prevState) => [
+        ...prevState,
+        { from, message, }
+
+      ])
+
+    })
+
+    return () => {
+      pusherClient.unsubscribe("my-channel");
+    };
+  }, [])
+
 
   return (
     <AppContainer>
-      {
-        messages.map(({ id, message }) => (
-          <MessagesContainer key={id}>
-            {message}
-          </MessagesContainer>
-        ))
-      }
-      <AddNewMessage onSend={handleSend} />
+      <MessagesContainer>
+        <MessagesList key='message-01' chats={chats}></MessagesList>
+      </MessagesContainer>
 
+      <AddNewMessage onSend={handleMessageSend} />
     </AppContainer>
   )
 }

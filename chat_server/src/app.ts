@@ -1,46 +1,71 @@
-import { createYoga, createSchema } from 'graphql-yoga'
-import { pusher } from './utils/pusher';
+import { createYoga, createSchema, createPubSub, } from 'graphql-yoga'
 
-import typeDefs from './schemas';
-import { chats } from './resolvers';
+import { pusher, } from './utils/pusher';
+interface Message {
+  message: string
+  id: number,
+  from: string
+}
+export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+
+const pubSub = createPubSub();
 
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs: typeDefs,
+    typeDefs: `
+    type Chat {
+      id: Int!
+      from: String!
+      message: String!
+    }
+  
+    type Query {
+      chats: [Chat]
+      hello: String
+    }
+    type Mutation{
+      sendMessage(from: String!, message: String!): Chat
+
+    }
+    type Subscription {
+      countdown(from: Int!): Int!
+      messageSent(from:String!):Chat
+    }  
+    `,
     resolvers: {
       Query: {
-        chats(root, args, context) {
+        hello: () => 'world',
+        chats(_, __, context) {
           return chats
         }
-
       },
       Mutation: {
-        sendMessage(root, { from, message }, { pubsub }) {
-          const chat = { id: chats.length + 1, from, message }
+        sendMessage(_, { from, message }, context) {
+          const chat = { id: chats.length + 1, from, message };
 
-          chats.push(chat)
+          chats.push(chat);
 
-          // Trigger a 'messageSent' event to all subscribers
-          pusher.trigger('my-channel', 'messageSent', {
-            message,
+          pusher.trigger("my-channel", "my-event", {
+            message: message,
+            from: from,
           });
+
+          // pubSub.publish('my-channel', { messageSent: chat })
           return chat
+
         }
       },
       Subscription: {
         messageSent: {
-          subscribe: (root, args, { pubsub }) => {
-
-          }
+          subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
+          // resolve: payload => payload
         }
       }
-
     }
-
   }),
-  context() {
-    return { currentUser: 13 }
-  }
+  context: request => {
+
+  },
 })
 
 
