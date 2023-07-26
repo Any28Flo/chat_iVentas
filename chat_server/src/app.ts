@@ -1,5 +1,5 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga'
-
+import { typeDefs } from './types';
 import { pusher, } from './utils/pusher';
 interface Message {
   message: string
@@ -12,26 +12,7 @@ const pubSub = createPubSub();
 
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs: `
-    type Chat {
-      id: Int!
-      from: String!
-      message: String!
-    }
-  
-    type Query {
-      chats: [Chat]
-      hello: String
-    }
-    type Mutation{
-      sendMessage(from: String!, message: String!): Chat
-
-    }
-    type Subscription {
-      countdown(from: Int!): Int!
-      messageSent(from:String!):Chat
-    }  
-    `,
+    typeDefs: typeDefs,
     resolvers: {
       Query: {
         hello: () => 'world',
