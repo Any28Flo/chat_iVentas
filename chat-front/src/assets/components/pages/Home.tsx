@@ -10,6 +10,7 @@ const initState = {
     password: ''
 }
 const Home = () => {
+
     const [formData, setFormData] = useState<FormData>(initState);
 
     const handleSubmit = (event: React.SyntheticEvent) => {
