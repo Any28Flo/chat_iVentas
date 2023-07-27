@@ -1,7 +1,13 @@
-import { createYoga, createSchema, createPubSub, } from 'graphql-yoga'
+import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
+import { compare } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
+
 import { typeDefs } from './types';
 import { pusher, } from './utils/pusher';
 import UserModel from './models/user.model';
+import mongoose from 'mongoose';
+import config from './utils/config';
+
 
 interface Message {
   message: string
@@ -9,9 +15,6 @@ interface Message {
   from: string
 }
 export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
-
-import mongoose from 'mongoose';
-import config from './utils/config';
 
 
 
@@ -32,6 +35,9 @@ const yoga = createYoga({
         hello: () => 'world',
         chats(_, __, context) {
           return chats
+        },
+        me: (_, __, { currentUser }) => {
+          return currentUser;
         }
       },
       Mutation: {
@@ -49,7 +55,8 @@ const yoga = createYoga({
           return chat
 
         },
-        createUser: async (_, args,) => {
+        createUser: async (_, args, context) => {
+
           const { username, phone, email, password } = args;
           const user = new UserModel({ username, phone, email, password });
           await user.save();
@@ -60,20 +67,51 @@ const yoga = createYoga({
            */
           pubSub.publish("newUser", { newUser: user });
           return user;
+        },
+        login: async (_, args) => {
+          const { email, password } = args;
 
+          try {
+            const user = await UserModel.findOne({ email });
+
+            if (!user) {
+              throw new Error('Invalid email or password');
+            }
+
+            const isPasswordValid = await compare(password, user.password);
+
+            if (!isPasswordValid) {
+              throw new Error('Invalid email or password');
+            }
+
+            const token = sign({ userId: user.email }, config.BCRYPT_HASH);
+
+            const userData = {
+              token: token,
+              user_info: {
+                username: user.username,
+                email: user.email,
+                phone: user.phone
+              }
+            };
+
+            return userData
+          } catch (error) {
+            throw new Error('Login failed: ');
+          }
         }
       },
       Subscription: {
         messageSent: {
           subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
-          // resolve: payload => payload
+
         }
       }
     }
   }),
-  context: request => {
-
-  },
+  context: ({ request }) => {
+    request
+  }
 })
 
 
