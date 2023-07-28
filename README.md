@@ -46,19 +46,19 @@ Build a realtime application that enable bi-directional communication.
 
 ## Goals
 
- - [ ] La aplicación debera contar con un Login()
+- [x] La aplicación debera contar con un Login()
 - [x] Registrar 10 usuarios (username, número de télefono, email y passsword)
- - [ ] La aplicación debera contar con un Login()
-- [ ] Una vez autenticado el usuario verá su lista de conversaciones correspondientes
-- [ ] Si el usuario selecciona una conversación se le mostrata los 25 mensajes recientes.
+- [x] Una vez autenticado el usuario verá su lista de conversaciones correspondientes
+- [x] Si el usuario selecciona una conversación se le mostrata los 25 mensajes recientes.
 
-- [ ] Será capaz de mandar mensajes
-- [ ] Verá en tiempo real los mensajes entrantes
+- [x] Será capaz de mandar mensajes
+- [x] Verá en tiempo real los mensajes entrantes
+- 
+## Bonus Points
+
 
 - [ ] Enviar y recibir mensajes con imagen o multimedia
 - [ ] Doble autenticación
 - [ ] Integración con Instagram 
 - [ ] Prueba end to end del algun servicio
 
-- If the initial connection is successful, enable a TCP connection.
-- Kept alive the connection for as long as needed. This way the server could send data. 

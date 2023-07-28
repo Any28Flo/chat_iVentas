@@ -4,9 +4,11 @@
   "description": "express server with pusher, graphQL in typescript",
   "main": "server.js",
   "scripts": {
-    "start": "node  ./dist/server.js",
+    "start": "node  dist/server.js",
+    "postinstall": "tsc",
     "tsc": " npx tsc",
-    "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts"
+    "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
+    "deploy": "git add . && git commit -m Heroku && git push heroku master"
   },
   "author": "Erika Flores",
   "license": "ISC",
