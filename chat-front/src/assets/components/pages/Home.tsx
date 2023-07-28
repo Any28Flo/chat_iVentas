@@ -10,11 +10,7 @@ import FormLogin from "../FormLogin";
 const Home = () => {
     const [login, { loading, error }] = useMutation(POST_LOGIN_QUERY,);
     const navigate = useNavigate();
-    /**
-     * 
-     * TODO:
-     * - add dat context
-     */
+
     function onSubmit(e) {
         e.preventDefault();
 

@@ -14,18 +14,25 @@ import {
     Image,
     useDisclosure,
 } from '@chakra-ui/react';
-import Icon from './../../styles/imgs/chat-icon.png'
+import Icon from './../../styles/imgs/chat-icon.png';
+
+import { useAppContext } from '../../context/appContext';
+
 const Layout = () => {
+
+    const { user, dispatch } = useAppContext();
+
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const logout = () => {
-        localStorage.removeItem('USER');
-        navigate('/login');
+        dispatch({
+            type: 'logout',
+        });
+        navigate('/');
     };
 
     useEffect(() => {
-        const user = localStorage.getItem('USER');
         if (!user) {
             navigate('/');
         }
