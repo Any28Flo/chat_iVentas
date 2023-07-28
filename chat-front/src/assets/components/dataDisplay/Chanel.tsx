@@ -4,7 +4,6 @@ import {
     CardHeader,
     Flex,
     Heading,
-    Text,
     Avatar,
     AvatarBadge
 } from '@chakra-ui/react';

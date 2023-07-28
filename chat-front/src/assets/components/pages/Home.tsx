@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { POST_LOGIN_QUERY } from "../../../api/user";
@@ -6,13 +5,10 @@ import { useMutation } from "@apollo/client";
 import FormLogin from "../FormLogin";
 
 
-type FormData = {
-    email: string,
-    password: string
-}
+
 
 const Home = () => {
-    const [login, { data, loading, error }] = useMutation(POST_LOGIN_QUERY,);
+    const [login, { loading, error }] = useMutation(POST_LOGIN_QUERY,);
     const navigate = useNavigate();
     /**
      * 
@@ -23,9 +19,6 @@ const Home = () => {
         e.preventDefault();
 
         const { email, password } = e.target.elements;
-        console.log(email.value);
-        console.log(password.value)
-
 
         login(
             {
