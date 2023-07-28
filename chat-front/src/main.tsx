@@ -9,6 +9,7 @@ import './index.css'
 import { ApolloProvider } from '@apollo/client';
 import { queryClient } from './assets/utils/index.ts';
 import router from './assets/routes/root.tsx';
+import { AppContext, AppProvider } from './assets/context/appContext.ts';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

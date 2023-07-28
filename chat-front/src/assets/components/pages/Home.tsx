@@ -1,18 +1,5 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    Alert,
-    AlertIcon,
-    Button,
-    Card,
-    CardBody,
-    CardFooter,
-    CardHeader,
-    Flex,
-    FormControl,
-    FormLabel,
-    Input,
-    Text,
-} from '@chakra-ui/react';
 
 import { POST_LOGIN_QUERY } from "../../../api/user";
 import { useMutation } from "@apollo/client";
@@ -22,7 +9,6 @@ import FormLogin from "../FormLogin";
 type FormData = {
     email: string,
     password: string
-
 }
 
 const Home = () => {
@@ -33,12 +19,28 @@ const Home = () => {
      * TODO:
      * - add dat context
      */
-    function onSubmit(loginData: FormData) {
+    function onSubmit(e) {
+        e.preventDefault();
+
+        const { email, password } = e.target.elements;
+        console.log(email.value);
+        console.log(password.value)
+
+
         login(
             {
-                variables: { email: loginData.email, password: loginData.password }
-                , onCompleted: () => {
-                    console.log(":D")
+                variables: { email: email.value, password: password.value }
+                , onCompleted: (data) => {
+                    console.log(data);
+                    const user = {
+                        token: data.token,
+                        data: {
+                            email: data.email,
+                            phone: data.phone,
+                            username: data.username
+                        }
+                    }
+                    localStorage.setItem('USER', JSON.stringify(user));
                     navigate("/chat-room");
                 }
             },);
@@ -48,10 +50,9 @@ const Home = () => {
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
-    /*
-        
 
-    */
+
+
 
     return (
         <>

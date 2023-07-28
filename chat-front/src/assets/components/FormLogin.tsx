@@ -25,18 +25,6 @@ const FormLogin = ({ onSubmit }: any) => {
 
     const [error, setError] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur',
-    });
-
-    function getEditorStyle(fieldError: FieldError | undefined) {
-        return fieldError ? 'border-red-500' : '';
-    }
-    const handleClic = () => {
-        console.log("clic");
-    }
-
     /*
     TODO:
     - handle errors
@@ -48,6 +36,10 @@ const FormLogin = ({ onSubmit }: any) => {
                     )}
 
     */
+    const handleClick = () => {
+        console.log(":D");
+
+    }
     return (
         <>
             <Flex align='center' bgGradient='linear(to-r, green.200, pink.500)' justify='center' minH='100vh'>
@@ -73,34 +65,25 @@ const FormLogin = ({ onSubmit }: any) => {
                         w={{ base: 'full', md: 'md' }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="email">Correo electrónico</FormLabel>
+                            <FormLabel>Correo electrónico</FormLabel>
                             <Input
-                                type="email"
-                                id="email"
-                                {...register('email', {
-                                    required: 'email es requerido',
-                                    pattern: {
-                                        value: /\S+@\S+\.\S+/,
-                                        message: 'Debes ingresar una email valido',
-                                    },
-                                })}
+                                name='email'
+                                onClick={handleClick}
                                 placeholder='Correo electrónico'
+                                required
                                 size='lg'
-                                onClick={handleClic}
-
+                                type='email'
                             />
                         </FormControl>
                         <FormControl>
                             <FormLabel htmlFor="password">Contraseña</FormLabel>
                             <Input
-
-                                type="password"
-                                id="password" name='password'
-                                onClick={handleClic}
+                                name='password'
+                                onClick={handleClick}
                                 placeholder='Contraseña'
                                 required
                                 size='lg'
-
+                                type='password'
                             />
                         </FormControl>
                     </CardBody>
