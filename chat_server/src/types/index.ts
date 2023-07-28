@@ -16,7 +16,10 @@ export const typeDefs = `
       messages : [ID!] 
     }
     type Message{
-      content :String,  
+      content :String, 
+      owner : ID,
+      chanel : ID
+
     }
     type AuthPayload {
       user_info: User!

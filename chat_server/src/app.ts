@@ -42,7 +42,7 @@ export function buildApp(app: ReturnType<typeof express>) {
         },
         Mutation: {
           createMessage: async (_, args, context) => {
-            const { content } = args;
+            const { content, owner, chanel } = args;
             const message = new MessageModel({
               content
             })
@@ -120,7 +120,13 @@ export function buildApp(app: ReturnType<typeof express>) {
           },
           createChanel: async (_, args, context) => {
             const { name } = args;
+
             try {
+              const chanelExist = await ChanelModel.findOne({ name: name })
+              if (chanelExist) {
+                throw new Error('Chanel name must be unique')
+              }
+
               const chanel = new ChanelModel({ name });
 
               const newChanel = await chanel.save();
@@ -131,7 +137,7 @@ export function buildApp(app: ReturnType<typeof express>) {
                */
 
               return {
-                name: 'das'
+                name: newChanel.name
               }
 
 

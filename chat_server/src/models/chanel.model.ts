@@ -5,7 +5,7 @@ interface IChanel extends Document {
 }
 const chanelSchema = new Schema({
     // owner: { type: Schema.Types.ObjectId, ref: 'userSchema' },
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, unique: true },
     messages: [{ type: Schema.Types.ObjectId, ref: 'MessageModel' }],
 }, {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
