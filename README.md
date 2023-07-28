@@ -53,10 +53,8 @@ Build a realtime application that enable bi-directional communication.
 
 - [x] Será capaz de mandar mensajes
 - [x] Verá en tiempo real los mensajes entrantes
-- 
+
 ## Bonus Points
-
-
 - [ ] Enviar y recibir mensajes con imagen o multimedia
 - [ ] Doble autenticación
 - [ ] Integración con Instagram 

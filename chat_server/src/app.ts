@@ -1,6 +1,5 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
-import { GraphQLError } from 'graphql'
-
+import mongoose from 'mongoose';
 import express from 'express';
 
 import { compare } from 'bcrypt';
@@ -11,24 +10,9 @@ import { pusher, } from './utils/pusher';
 import UserModel from './models/user.model';
 
 import config from './utils/config';
-
-
-
-interface Message {
-  message: string
-  id: number,
-  from: string
-}
-interface LoginData {
-  password: string,
-  email: string
-}
-interface User {
-  username: string,
-  email: string,
-  phone: string
-}
-export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+import MessageModel from './models/message.model';
+import ChanelModel from './models/chanel.model';
+import { log } from 'console';
 
 
 const pubSub = createPubSub();
@@ -47,41 +31,80 @@ export function buildApp(app: ReturnType<typeof express>) {
         Query: {
           hello: () => 'world',
           chats(_, __, context) {
-            return chats
+            //add method call all messages by idChanel
           },
           me: (_, __, { currentUser }) => {
             //handle it with sessions
             return currentUser;
           },
+          getChanel: async (_, { owner }) => {
+
+            try {
+              const objectId = new mongoose.Types.ObjectId(owner);
+
+              const chanel = await ChanelModel.findOne({ owner: objectId })
+              /**
+               * TODO:
+               * -debug why isn't working populate
+              */
+              if (!chanel) {
+                throw new Error("Create a chat first")
+              }
+
+              return {
+                _id: 'asdfa21',
+                name: "chanel",
+                members: [
+
+                  'adfads'
+
+                ]
+              }
+
+            } catch (error) {
+
+            }
+          }
 
         },
         Mutation: {
-          sendMessage(_, { from, message }, context) {
-            const chat = { id: chats.length + 1, from, message };
+          createMessage: async (_, args, context) => {
+            const { content, owner, chanel } = args;
+            const message = new MessageModel({
+              content,
+              owner,
+              chanel
+            })
+            try {
 
-            chats.push(chat);
+              const messageSaved = await message.save();
+              /*pusher.trigger("my-channel", "create-message", {
+                content: content
+              });*/
 
-            pusher.trigger("my-channel", "my-event", {
-              message: message,
-              from: from,
-            });
+              return messageSaved
 
+            } catch (error) {
+              console.log(error);
+
+              throw new Error('Error create message');
+
+            }
             // pubSub.publish('my-channel', { messageSent: chat })
-            return chat
 
           },
           createUser: async (_, args, context) => {
 
             const { username, phone, email, password } = args;
             const user = new UserModel({ username, phone, email, password });
-            await user.save();
+            const userDB = await user.save();
             /**
              * TODO
              * - Add error handler
              * 
              */
             pubSub.publish("newUser", { newUser: user });
-            return user;
+            return userDB;
           },
           login: async (_, args, context) => {
 
@@ -97,9 +120,7 @@ export function buildApp(app: ReturnType<typeof express>) {
               const isPasswordValid = await compare(password, user.password);
 
               if (!isPasswordValid) {
-                return Promise.reject(
-                  new GraphQLError(`Cannot post comment on non-existing link with id '${args.linkId}'.`)
-                )
+
                 throw new Error('Invalid email or password');
               }
 
@@ -120,6 +141,41 @@ export function buildApp(app: ReturnType<typeof express>) {
               throw new Error('Login failed: ');
             }
 
+
+          },
+          createChanel: async (_, args, context) => {
+            const { name, owner } = args;
+
+            try {
+              const chanelExist = await ChanelModel.findOne({ name: name })
+              if (chanelExist) {
+                throw new Error('Chanel name must be unique')
+              }
+
+              const chanel = new ChanelModel({ name, owner });
+
+              const newChanel = await chanel.save();
+              /**
+               * 
+               * TODO:
+               * - handle validation chanel-name unique
+               */
+
+              return {
+                name: newChanel.name
+              }
+
+
+
+            } catch (error) {
+
+            }
+            /**
+             * TODO
+             * - Add error handler
+             * 
+             */
+            //pubSub.publish("newUser", { newUser: user });
 
           }
 
