@@ -12,24 +12,8 @@ import UserModel from './models/user.model';
 
 import config from './utils/config';
 import MessageModel from './models/message.model';
-
-
-
-interface Message {
-  message: string
-  id: number,
-  from: string
-}
-interface LoginData {
-  password: string,
-  email: string
-}
-interface User {
-  username: string,
-  email: string,
-  phone: string
-}
-export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
+import ChanelModel from './models/chanel.model';
+import { log } from 'console';
 
 
 const pubSub = createPubSub();
@@ -48,7 +32,7 @@ export function buildApp(app: ReturnType<typeof express>) {
         Query: {
           hello: () => 'world',
           chats(_, __, context) {
-            return chats
+            //add method call all messages by idChanel
           },
           me: (_, __, { currentUser }) => {
             //handle it with sessions
@@ -132,6 +116,35 @@ export function buildApp(app: ReturnType<typeof express>) {
               throw new Error('Login failed: ');
             }
 
+
+          },
+          createChanel: async (_, args, context) => {
+            const { name } = args;
+            try {
+              const chanel = new ChanelModel({ name });
+
+              const newChanel = await chanel.save();
+              /**
+               * 
+               * TODO:
+               * - handle validation chanel-name unique
+               */
+
+              return {
+                name: 'das'
+              }
+
+
+
+            } catch (error) {
+
+            }
+            /**
+             * TODO
+             * - Add error handler
+             * 
+             */
+            //pubSub.publish("newUser", { newUser: user });
 
           }
 

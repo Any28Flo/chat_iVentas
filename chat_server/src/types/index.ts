@@ -4,14 +4,19 @@ export const typeDefs = `
       owner: String!
       content: String!
     }
+
     type User {
       username: String!
       email: String!
       phone: String!
     }
+    
+    type Chanel{
+      name: String,
+      messages : [ID!] 
+    }
     type Message{
-      content :String,
-      
+      content :String,  
     }
     type AuthPayload {
       user_info: User!
@@ -22,6 +27,7 @@ export const typeDefs = `
       password: String,
       email: String
     }
+    
     type Error {
       message: String!
     }
@@ -38,6 +44,8 @@ export const typeDefs = `
     }
     type Mutation{
       createMessage(content: String!): Chat
+
+      createChanel(name:String):Chanel
 
       createUser(username: String! email: String!,phone: String!, password: String!): User!
       login(email: String!, password: String!):AuthPayload 

@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 const messageSchema = new Schema({
     // owner: { type: Schema.Types.ObjectId, ref: 'userSchema' },
