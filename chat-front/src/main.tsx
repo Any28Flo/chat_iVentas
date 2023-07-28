@@ -2,6 +2,7 @@ import React from 'react'
 
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from "react-router-dom";
+import { ChakraProvider } from '@chakra-ui/react'
 
 import './index.css'
 
@@ -12,7 +13,10 @@ import router from './assets/routes/root.tsx';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <ChakraProvider>
+        <RouterProvider router={router} />
+      </ChakraProvider>
+
     </ApolloProvider>
   </React.StrictMode>
 

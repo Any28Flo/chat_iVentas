@@ -1,4 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import {
+    Alert,
+    AlertIcon,
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Flex,
+    FormControl,
+    FormLabel,
+    Input,
+    Text,
+} from '@chakra-ui/react';
 
 import { POST_LOGIN_QUERY } from "../../../api/user";
 import { useMutation } from "@apollo/client";
@@ -17,7 +31,7 @@ const Home = () => {
     /**
      * 
      * TODO:
-     * - add data to context
+     * - add dat context
      */
     function onSubmit(loginData: FormData) {
         login(
@@ -34,17 +48,16 @@ const Home = () => {
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
+    /*
+        
 
+    */
 
     return (
         <>
-            <h2>Login</h2>
             <FormLogin onSubmit={onSubmit} />
-            {/* {error.graphQLErrors.map(({ message: string }, i) => (
-                <span key={i}>{message}</span>
-            ))} */}
-
         </>
+
     )
 }
 export default Home;
