@@ -5,7 +5,6 @@ export type ProtectedRouteTypes = {
 }
 const ProtectedRoute = ({ username }: ProtectedRouteTypes) => {
 
-
     if (!username) {
         return <Navigate to='/' replace />;
     }

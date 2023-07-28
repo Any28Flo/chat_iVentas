@@ -5,7 +5,7 @@ export const typeDefs = `
       message: String!
     }
     type User {
-      id: ID!
+  
       username: String!
       email: String!
       phone: String!
@@ -13,7 +13,18 @@ export const typeDefs = `
     type AuthPayload {
       user_info: User!
       token: String!
+  
     }
+    type LoginData {
+      password: String,
+      email: String
+    }
+    type Error {
+      message: String!
+    }
+    
+    union Login = AuthPayload | Error
+    
   
   
     type Query {
@@ -26,11 +37,13 @@ export const typeDefs = `
       sendMessage(from: String!, message: String!): Chat
 
       createUser(username: String! email: String!,phone: String!, password: String!): User!
-      login(email: String!, password: String!): AuthPayload # Login with email and password
+      login(email: String!, password: String!):AuthPayload 
+    
 
     }
     type Subscription {
       countdown(from: Int!): Int!
       messageSent(from:String!):Chat
     }  
+
     `

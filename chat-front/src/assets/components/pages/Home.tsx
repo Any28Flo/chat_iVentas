@@ -1,64 +1,48 @@
-import { useState } from "react";
-import { POST_LOGIN_QUERY } from "./../../../api/user";
+import { useNavigate } from "react-router-dom";
+
+import { POST_LOGIN_QUERY } from "../../../api/user";
 import { useMutation } from "@apollo/client";
+import FormLogin from "../FormLogin";
+
 
 type FormData = {
     email: string,
     password: string
 
 }
-const initState = {
-    email: '',
-    password: ''
-}
-
 
 const Home = () => {
-    const [addTodo, { data, loading, error }] = useMutation(POST_LOGIN_QUERY);
+    const [login, { data, loading, error }] = useMutation(POST_LOGIN_QUERY,);
+    const navigate = useNavigate();
+    /**
+     * 
+     * TODO:
+     * - add data to context
+     */
+    function onSubmit(loginData: FormData) {
+        login(
+            {
+                variables: { email: loginData.email, password: loginData.password }
+                , onCompleted: () => {
+                    console.log(":D")
+                    navigate("/chat-room");
+                }
+            },);
+
+    }
+
 
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
 
-    const [login, setFormData] = useState<FormData>(initState);
 
-    const handleSubmit = (event: React.SyntheticEvent) => {
-        event.preventDefault();
-        // router.push("/chat");
-    }
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = event.target;
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: value,
-        }));
-    };
     return (
         <>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <button type="submit">Submit</button>
-            </form>
+            <h2>Login</h2>
+            <FormLogin onSubmit={onSubmit} />
+            {/* {error.graphQLErrors.map(({ message: string }, i) => (
+                <span key={i}>{message}</span>
+            ))} */}
 
         </>
     )

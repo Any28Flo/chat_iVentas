@@ -7,9 +7,9 @@ const pusher = new Pusher({
     appId: config.APP_ID,
     key: config.KEY,
     secret: config.SECRET,
-    cluster: config.CLUSTER
+    cluster: config.CLUSTER,
+    useTLS: true,
 });
-
 
 
 export { pusher }

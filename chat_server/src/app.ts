@@ -1,12 +1,17 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
+import { GraphQLError } from 'graphql'
+
+import express from 'express';
+
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 
 import { typeDefs } from './types';
 import { pusher, } from './utils/pusher';
 import UserModel from './models/user.model';
-import mongoose from 'mongoose';
+
 import config from './utils/config';
+
 
 
 interface Message {
@@ -14,105 +19,126 @@ interface Message {
   id: number,
   from: string
 }
+interface LoginData {
+  password: string,
+  email: string
+}
+interface User {
+  username: string,
+  email: string,
+  phone: string
+}
 export const chats: Message[] = [{ message: 'Hello', id: 1, from: 'Any11' }, { message: 'Hello', id: 2, from: "Darklord" }];
-
-
-
-
-mongoose.connect(config.MONGODB_URL)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Error connecting to MongoDB:', err));
-
 
 
 const pubSub = createPubSub();
 
-const yoga = createYoga({
-  schema: createSchema({
-    typeDefs: typeDefs,
-    resolvers: {
-      Query: {
-        hello: () => 'world',
-        chats(_, __, context) {
-          return chats
-        },
-        me: (_, __, { currentUser }) => {
-          return currentUser;
-        }
-      },
-      Mutation: {
-        sendMessage(_, { from, message }, context) {
-          const chat = { id: chats.length + 1, from, message };
-
-          chats.push(chat);
-
-          pusher.trigger("my-channel", "my-event", {
-            message: message,
-            from: from,
-          });
-
-          // pubSub.publish('my-channel', { messageSent: chat })
-          return chat
+export function buildApp(app: ReturnType<typeof express>) {
+  const yoga = createYoga({
+    cors: {
+      origin: 'http://localhost:5173',
+      credentials: true,
+      allowedHeaders: ['X-Custom-Header'],
+      methods: ['POST']
+    },
+    schema: createSchema({
+      typeDefs: typeDefs,
+      resolvers: {
+        Query: {
+          hello: () => 'world',
+          chats(_, __, context) {
+            return chats
+          },
+          me: (_, __, { currentUser }) => {
+            //handle it with sessions
+            return currentUser;
+          },
 
         },
-        createUser: async (_, args, context) => {
+        Mutation: {
+          sendMessage(_, { from, message }, context) {
+            const chat = { id: chats.length + 1, from, message };
 
-          const { username, phone, email, password } = args;
-          const user = new UserModel({ username, phone, email, password });
-          await user.save();
-          /**
-           * TODO
-           * - Add error handler
-           * 
-           */
-          pubSub.publish("newUser", { newUser: user });
-          return user;
-        },
-        login: async (_, args) => {
-          const { email, password } = args;
+            chats.push(chat);
 
-          try {
-            const user = await UserModel.findOne({ email });
+            pusher.trigger("my-channel", "my-event", {
+              message: message,
+              from: from,
+            });
 
-            if (!user) {
-              throw new Error('Invalid email or password');
-            }
+            // pubSub.publish('my-channel', { messageSent: chat })
+            return chat
 
-            const isPasswordValid = await compare(password, user.password);
+          },
+          createUser: async (_, args, context) => {
 
-            if (!isPasswordValid) {
-              throw new Error('Invalid email or password');
-            }
+            const { username, phone, email, password } = args;
+            const user = new UserModel({ username, phone, email, password });
+            await user.save();
+            /**
+             * TODO
+             * - Add error handler
+             * 
+             */
+            pubSub.publish("newUser", { newUser: user });
+            return user;
+          },
+          login: async (_, args, context) => {
 
-            const token = sign({ userId: user.email }, config.BCRYPT_HASH);
+            const { email, password } = args;
 
-            const userData = {
-              token: token,
-              user_info: {
-                username: user.username,
-                email: user.email,
-                phone: user.phone
+            try {
+              const user = await UserModel.findOne({ email });
+
+              if (!user) {
+                throw new Error('Invalid email or password');
               }
-            };
 
-            return userData
-          } catch (error) {
-            throw new Error('Login failed: ');
+              const isPasswordValid = await compare(password, user.password);
+
+              if (!isPasswordValid) {
+                return Promise.reject(
+                  new GraphQLError(`Cannot post comment on non-existing link with id '${args.linkId}'.`)
+                )
+                throw new Error('Invalid email or password');
+              }
+
+              const token = sign({ userId: user.email }, config.BCRYPT_HASH);
+
+              const userData = {
+
+                user_info: {
+                  username: user.username,
+                  email: user.email,
+                  phone: user.phone
+                },
+                token: token
+              };
+
+              return userData
+            } catch (error) {
+              throw new Error('Login failed: ');
+            }
+
+
+          }
+
+        },
+        Subscription: {
+          messageSent: {
+            subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
+
           }
         }
-      },
-      Subscription: {
-        messageSent: {
-          subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
-
-        }
       }
+    }),
+    context: ({ request }) => {
+      request
     }
-  }),
-  context: ({ request }) => {
-    request
-  }
-})
+  })
+  app.use(yoga.graphqlEndpoint, yoga);
+
+  return yoga.graphqlEndpoint;
+}
 
 
-export default yoga
