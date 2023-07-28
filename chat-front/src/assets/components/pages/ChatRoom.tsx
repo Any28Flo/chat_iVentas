@@ -1,9 +1,4 @@
-import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
 
-import { Grid, GridItem } from '@chakra-ui/react';
-
-import { GET_CHANEL_BY_USER } from "../../../api/chanels";
 import {
     Box,
     Card,
@@ -11,9 +6,42 @@ import {
     Flex,
     Heading,
     Avatar,
-    AvatarBadge
+    AvatarBadge,
+    CardBody,
+    Text
 } from '@chakra-ui/react';
+
+import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
+
+import { Grid, GridItem } from '@chakra-ui/react';
+
+import { GET_CHANEL_BY_USER } from "../../../api/chanels";
+
 import Chanel from "../dataDisplay/Chanel";
+import AddNewMessage from '../Message/AddNewMessage';
+
+
+const messagesArray = [
+    {
+        _id: "ase123",
+        content: 'hello',
+        chanel: 'my-chanel-2',
+        owner: {
+            username: 'Batman'
+        }
+
+    },
+    {
+        _id: "ase124",
+        content: 'hello Batman',
+        chanel: 'my-chanel-2',
+        owner: {
+            username: 'WonderWoman'
+        }
+
+    }
+]
 const initState = [
     {
         id: '123',
@@ -21,7 +49,8 @@ const initState = [
         member:
         {
             username: 'Robin',
-        }
+        },
+        messages: messagesArray
 
     },
     {
@@ -30,14 +59,22 @@ const initState = [
         member:
         {
             username: 'WonderWoman',
-        }
+        },
+        messages: messagesArray
     },
 
-]
+];
 const ChatRoom = () => {
 
     const [chanels, setChanels] = useState(initState);
     const [chanelActive, setChanelActive] = useState();
+    const [messages, setMessages] = useState(messagesArray)
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSend = data => {
+        console.log(data);
+
+    }
 
     /*const { loading, error, data } = useQuery(GET_CHANEL_BY_USER, {
         variables: { owner: '64c392276849dc34c2a092e7' }
@@ -56,17 +93,29 @@ const ChatRoom = () => {
     if (data) {
         console.log(data)
     }*/
-    const handleClick = idRoom => {
+    const handleClick = idChanel => {
+        setIsLoading(true)
+        if (chanelActive) {
+            const filteredArray = initState.filter(item => item.id === idChanel);
+            setMessages(filteredArray.messages)
+            setChanelActive(filteredArray)
+        }
 
-        setChanelActive(idRoom)
+        setIsLoading(false)
+        //const messagesActives = initState
+        //setMessages
     }
+    useEffect(() => {
+
+    }, [chanelActive, messages])
+
+    if (isLoading) return '....cargando';
 
     return (
         <Grid
-            templateAreas={`
-                  "nav main"`}
+            templateAreas={`"nav main"`}
             height='100%'
-            gridTemplateRows={'50px 1fr 30px'}
+            gridTemplateRows={'1fr 1fr'}
             gridTemplateColumns={'150px 1fr'}
             gap='1'
             color='blackAlpha.700'
@@ -82,12 +131,39 @@ const ChatRoom = () => {
                     })
                 }
             </GridItem>
-            <GridItem pl='2' bg='green.300' area={'main'}>
-                <Card maxW='md'>
+            <GridItem pl='2' bg='green.300' area={'main'} width="100%" >
 
-                </Card>
+                {
+                    messages.map(message => {
+                        return (
+                            <Card maxW='md' mb='4'   >
+                                <Flex spacing='4'>
+                                    <Avatar
+                                        name="Computer"
+                                        src="https://avataaars.io/?avatarStyle=Transparent&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
+                                        bg="blue.300"
+                                    ></Avatar>
+                                    <Flex
+                                        bg="gray.100"
+                                        color="black"
+                                        my="1"
+                                        p="3"
+                                        width="100%"
+                                    >
+                                        <Text>{message.content}</Text>
+                                    </Flex>
+                                </Flex>
+
+                            </Card>
+                        )
+                    })
+                }
+                {
+                    <AddNewMessage onSend={handleSend} />
+                }
+
             </GridItem>
-        </Grid>
+        </Grid >
     )
 }
 export default ChatRoom;

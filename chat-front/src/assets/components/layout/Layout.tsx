@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ChevronRightIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import { useNavigate, Outlet } from "react-router-dom";
 
 import {
@@ -14,7 +14,7 @@ import {
     Image,
     useDisclosure,
 } from '@chakra-ui/react';
-
+import Icon from './../../styles/imgs/chat-icon.png'
 const Layout = () => {
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -32,7 +32,7 @@ const Layout = () => {
     }, [navigate]);
 
     return (
-        <Box bg='gray.500' color='white' minH='100vh'>
+        <Box bg='#F5F5F5' color='white' minH='100vh'>
             <Container
                 as={Flex}
                 flexDir='column'
@@ -44,7 +44,7 @@ const Layout = () => {
                 <Flex align='center' justify='space-between'>
                     <Image
                         maxW={{ base: '40', lg: '64' }}
-                        src='https://burguerqueen11.web.app/static/media/Logo-BQ2.e31b9446.png'
+                        src={Icon}
                         w='full'
                     />
                     <IconButton
@@ -55,7 +55,7 @@ const Layout = () => {
                         size='lg'
                         variant='outline'
                         _hover={{
-                            bg: 'yellow.500',
+                            bg: '#F07E28',
                         }}
                     />
                 </Flex>
@@ -66,9 +66,9 @@ const Layout = () => {
                 <DrawerContent>
                     <DrawerBody as={Flex} flexDir='column' gap='8' px='4' py='12'>
                         <Image
-                            bg={'yellow.500'}
+
                             borderRadius='lg'
-                            src='https://burguerqueen11.web.app/static/media/Logo-BQ2.e31b9446.png'
+                            src={Icon}
                             w='full'
                         />
                         <Flex as='nav' flex='1' flexDir='column' gap='4'>
@@ -79,8 +79,8 @@ const Layout = () => {
                             size='lg'
                             variant='outline'
                             _hover={{
-                                bg: 'yellow.500',
-                                borderColor: 'yellow.500',
+                                bg: '#F07E28',
+                                borderColor: '#F07E28',
                                 color: 'white',
                                 fontWeight: 'semibold',
                             }}
