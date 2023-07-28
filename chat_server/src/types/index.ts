@@ -46,9 +46,9 @@ export const typeDefs = `
 
     }
     type Mutation{
-      createMessage(content: String!): Chat
+      createMessage(content: String!, owner: ID , chanel: ID): Chat
 
-      createChanel(name:String):Chanel
+      createChanel(name:String, owner: ID, member:[ID]):Chanel
 
       createUser(username: String! email: String!,phone: String!, password: String!): User!
       login(email: String!, password: String!):AuthPayload 

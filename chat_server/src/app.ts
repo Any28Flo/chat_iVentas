@@ -44,18 +44,18 @@ export function buildApp(app: ReturnType<typeof express>) {
           createMessage: async (_, args, context) => {
             const { content, owner, chanel } = args;
             const message = new MessageModel({
-              content
+              content,
+              owner,
+              chanel
             })
             try {
+
               const messageSaved = await message.save();
               /*pusher.trigger("my-channel", "create-message", {
                 content: content
               });*/
-              return {
-                id: '23fADFADDF##$!"s',
-                content: messageSaved.content,
-                owner: '12e21'
-              }
+
+              return messageSaved
 
             } catch (error) {
               console.log(error);
@@ -93,9 +93,7 @@ export function buildApp(app: ReturnType<typeof express>) {
               const isPasswordValid = await compare(password, user.password);
 
               if (!isPasswordValid) {
-                return Promise.reject(
-                  new GraphQLError(`Cannot post comment on non-existing link with id '${args.linkId}'.`)
-                )
+
                 throw new Error('Invalid email or password');
               }
 
@@ -119,7 +117,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
           },
           createChanel: async (_, args, context) => {
-            const { name } = args;
+            const { name, owner } = args;
 
             try {
               const chanelExist = await ChanelModel.findOne({ name: name })
@@ -127,7 +125,7 @@ export function buildApp(app: ReturnType<typeof express>) {
                 throw new Error('Chanel name must be unique')
               }
 
-              const chanel = new ChanelModel({ name });
+              const chanel = new ChanelModel({ name, owner });
 
               const newChanel = await chanel.save();
               /**
