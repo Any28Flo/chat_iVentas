@@ -3,21 +3,19 @@ import { User } from '../api/User';
 
 type State = {
     user: undefined | User | {};
-    loading: boolean;
+    token: String;
 };
 
 const initialState: State = {
-    user: undefined,
-    loading: false,
+    token: '',
+    user: undefined
 };
 
 type Action =
+
     | {
-        type: 'authenticate';
-    }
-    | {
-        type: 'authenticated';
-        payload: User | undefined;
+        type: 'login';
+        payload: State;
     }
     | {
         type: 'logout';
@@ -25,12 +23,10 @@ type Action =
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
-        case 'authenticate':
-            return { ...state, loading: true };
-        case 'authenticated':
-            return { ...state, loading: false, user: action.user };
+        case 'login':
+            return { ...state, user: action.payload.user, token: action.payload.token };
         case 'logout':
-            return { ...state, loading: false, user: {} }
+            return { ...state, user: {} }
         default:
             return state;
     }

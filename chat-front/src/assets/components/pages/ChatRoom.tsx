@@ -81,12 +81,6 @@ const ChatRoom = () => {
 
     });*/
 
-    useEffect(() => {
-        const user = localStorage.getItem('USER');
-        if (user) {
-            const userData = JSON.parse(user);
-        }
-    }, [])
     /*if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
 
