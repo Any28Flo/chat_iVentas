@@ -1,4 +1,18 @@
-
+import { useState } from 'react';
+import {
+    Alert,
+    AlertIcon,
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Flex,
+    FormControl,
+    FormLabel,
+    Input,
+    Text,
+} from '@chakra-ui/react';
 import { useForm, FieldError } from 'react-hook-form';
 import { ValidationError } from './ValidationError';
 
@@ -9,46 +23,89 @@ type FormData = {
 }
 const FormLogin = ({ onSubmit }: any) => {
 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-        mode: 'onBlur',
-        reValidateMode: 'onBlur',
-    });
+    const [error, setError] = useState(false);
 
-    function getEditorStyle(fieldError: FieldError | undefined) {
-        return fieldError ? 'border-red-500' : '';
+    /*
+    TODO:
+    - handle errors
+     {errors && (
+                        <Alert justifyContent='center' status='error'>
+                            <AlertIcon />
+                            Correo o contraseña incorrectos
+                        </Alert>
+                    )}
+
+    */
+    const handleClick = () => {
+        console.log(":D");
+
     }
-
     return (
         <>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <label htmlFor="email">Ingresa tu email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        {...register('email', {
-                            required: 'email es requerido',
-                            pattern: {
-                                value: /\S+@\S+\.\S+/,
-                                message: 'Debes ingresar una email valido',
-                            },
-                        })}
-                    />
-                    <ValidationError fieldError={errors.email} />
-                </div>
-                <div>
-                    <label htmlFor="password">Ingresa tu contrasena</label>
-                    <input
-                        type="password"
-                        id="password"
-                        {...register('password', {
-                            required: 'password es requerido',
+            <Flex align='center' bgGradient='linear(to-r, green.200, pink.500)' justify='center' minH='100vh'>
+                <Card as='form' borderRadius='none' onSubmit={onSubmit}>
 
-                        })}
-                    />
-                </div>
-                <button type='submit'>Inicia sesion</button>
-            </form>
+
+                    <CardHeader px={{ base: '4', lg: '12' }} py={{ base: '4', lg: '8' }}>
+                        <Text
+                            align='center'
+                            fontWeight='semibold'
+                            fontSize='xl'
+                            letterSpacing='wider'
+                            textTransform='uppercase'
+                        >
+                            Inicia sesión
+                        </Text>
+                    </CardHeader>
+                    <CardBody
+                        as={Flex}
+                        flexDir='column'
+                        gap='8'
+                        px={{ base: '4', lg: '12' }}
+                        w={{ base: 'full', md: 'md' }}
+                    >
+                        <FormControl>
+                            <FormLabel>Correo electrónico</FormLabel>
+                            <Input
+                                name='email'
+                                onClick={handleClick}
+                                placeholder='Correo electrónico'
+                                required
+                                size='lg'
+                                type='email'
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel htmlFor="password">Contraseña</FormLabel>
+                            <Input
+                                name='password'
+                                onClick={handleClick}
+                                placeholder='Contraseña'
+                                required
+                                size='lg'
+                                type='password'
+                            />
+                        </FormControl>
+                    </CardBody>
+                    <CardFooter px={{ base: '4', lg: '12' }} py={{ base: '4', lg: '8' }}>
+                        <Button
+                            colorScheme='teal'
+                            mx='auto'
+                            size='lg'
+                            type='submit'
+                            variant='outline'
+                            _hover={{
+                                bg: 'yellow.500',
+                                borderColor: 'linear(to-l, #7928CA, #FF0080)',
+                                color: 'white',
+                                fontWeight: 'semibold',
+                            }}
+                        >
+                            Iniciar sesión
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </Flex >
         </>
 
     )

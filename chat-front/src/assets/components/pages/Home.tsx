@@ -5,26 +5,35 @@ import { useMutation } from "@apollo/client";
 import FormLogin from "../FormLogin";
 
 
-type FormData = {
-    email: string,
-    password: string
 
-}
 
 const Home = () => {
-    const [login, { data, loading, error }] = useMutation(POST_LOGIN_QUERY,);
+    const [login, { loading, error }] = useMutation(POST_LOGIN_QUERY,);
     const navigate = useNavigate();
     /**
      * 
      * TODO:
-     * - add data to context
+     * - add dat context
      */
-    function onSubmit(loginData: FormData) {
+    function onSubmit(e) {
+        e.preventDefault();
+
+        const { email, password } = e.target.elements;
+
         login(
             {
-                variables: { email: loginData.email, password: loginData.password }
-                , onCompleted: () => {
-                    console.log(":D")
+                variables: { email: email.value, password: password.value }
+                , onCompleted: (data) => {
+                    console.log(data);
+                    const user = {
+                        token: data.token,
+                        data: {
+                            email: data.email,
+                            phone: data.phone,
+                            username: data.username
+                        }
+                    }
+                    localStorage.setItem('USER', JSON.stringify(user));
                     navigate("/chat-room");
                 }
             },);
@@ -35,16 +44,11 @@ const Home = () => {
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
 
-
     return (
         <>
-            <h2>Login</h2>
             <FormLogin onSubmit={onSubmit} />
-            {/* {error.graphQLErrors.map(({ message: string }, i) => (
-                <span key={i}>{message}</span>
-            ))} */}
-
         </>
+
     )
 }
 export default Home;
