@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={queryClient}>
       <ChakraProvider>
-        <RouterProvider router={router} />
+        <RouterProvider router={router} fallbackElement={<p>Loading...</p>} />
       </ChakraProvider>
 
     </ApolloProvider>

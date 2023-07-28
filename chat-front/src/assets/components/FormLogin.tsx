@@ -106,14 +106,14 @@ const FormLogin = ({ onSubmit }: any) => {
                     </CardBody>
                     <CardFooter px={{ base: '4', lg: '12' }} py={{ base: '4', lg: '8' }}>
                         <Button
-                            colorScheme='yellow'
+                            colorScheme='teal'
                             mx='auto'
                             size='lg'
                             type='submit'
                             variant='outline'
                             _hover={{
                                 bg: 'yellow.500',
-                                borderColor: 'yellow.500',
+                                borderColor: 'linear(to-l, #7928CA, #FF0080)',
                                 color: 'white',
                                 fontWeight: 'semibold',
                             }}
