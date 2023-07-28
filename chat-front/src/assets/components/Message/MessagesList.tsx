@@ -1,5 +1,3 @@
-
-
 const MessagesList = (props: Messages) => {
     const { chats } = props;
 
@@ -14,7 +12,6 @@ const MessagesList = (props: Messages) => {
                         )
                     })
                 }
-
             </ul>
         </>
     );

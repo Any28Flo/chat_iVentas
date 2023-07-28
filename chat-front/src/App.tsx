@@ -1,51 +1,43 @@
+import React from 'react';
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { AppContainer, MessagesContainer } from "./assets/components/styles";
-import AddNewMessage from "./assets/components/Message/AddNewMessage";
-import MessagesList from "./assets/components/Message/MessagesList";
+import { AppContainer } from "./assets/components/styles";
 
-import { pusherClient } from "./assets/utils";
+import ProtectedRoute from "./assets/components/layout/ProtectedRoute";
+import ChatRoom from "./assets/components/pages/ChatRoom";
+import Home from "./assets/components/pages/Home";
 
+type Props = {
+  children: string | JSX.Element
+}
 
-function App() {
-
-  const [chats, setChats] = useState([]);
-
-  const handleMessageSend = (message: string) => {
-    let newMessage = {
-      from: 'Daedra',
-      message: message
-    }
-  }
+function App({ children }: Props) {
 
 
-  useEffect(() => {
-    const channel = pusherClient.subscribe("my-channel");
-    //  console.log(channel)
-    channel.bind('my-event', (data: Message) => {
-      console.log(data);
-      const { from, message } = data
-      setChats((prevState) => [
-        ...prevState,
-        { from, message, }
+  //useEffect(() => {
+  //const channel = pusherClient.subscribe("my-channel");
+  //  console.log(channel)
+  //channel.bind('my-event', (data: Message) => {
+  //console.log(data);
+  //const { from, message } = data
+  //setChats((prevState) => [
+  //...prevState,
+  //{ from, message, }
 
-      ])
+  //])
 
-    })
+  //})
 
-    return () => {
-      pusherClient.unsubscribe("my-channel");
-    };
-  }, [])
+  //return () => {
+  //pusherClient.unsubscribe("my-channel");
+  //};
+  //}, [])
 
 
   return (
     <AppContainer>
-      <MessagesContainer>
-        <MessagesList key='message-01' chats={chats}></MessagesList>
-      </MessagesContainer>
-
-      <AddNewMessage onSend={handleMessageSend} />
+      {children}
     </AppContainer>
   )
 }

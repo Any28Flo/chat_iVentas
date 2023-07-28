@@ -1,17 +1,21 @@
-import Pusher from 'pusher-js';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
-const PUSHER_KEY = import.meta.env.VITE_APP_PUSHER_KEY;
-const PUSHER_CLUSTER = import.meta.env.VITE_APP_PUSHER_CLUSTER;
+export const LOGIN_QUERY = gql`
+  # Increments a back-end counter and gets its resulting value
+  mutation login {
+  login(email:"yoda2@gmail.com", password:"98765432" ){
+    token
+    user_info {
+      username
+      email
+      phone
+    }
+  }
+}
+`;
 
-export const pusherClient = new Pusher(PUSHER_KEY, {
-    cluster: PUSHER_CLUSTER,
-});
 
 export const queryClient = new ApolloClient({
-    uri: import.meta.env.VITE_APP_CHAT_URI,
-    cache: new InMemoryCache(),
+  uri: import.meta.env.VITE_APP_CHAT_URI!,
+  cache: new InMemoryCache(),
 });
-
-
-
