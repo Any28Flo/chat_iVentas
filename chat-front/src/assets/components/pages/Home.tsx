@@ -51,9 +51,6 @@ const Home = () => {
     if (loading) return 'Submitting...';
     if (error) return `Submission error! ${error.message}`;
 
-
-
-
     return (
         <>
             <FormLogin onSubmit={onSubmit} />
