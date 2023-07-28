@@ -1,8 +1,5 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types, Model } from 'mongoose';
 
-interface IChanel extends Document {
-    name: string;
-}
 const chanelSchema = new Schema({
     name: { type: String, required: true, trim: true, unique: true },
     messages: [{ type: Schema.Types.ObjectId, ref: 'MessageModel' }],
@@ -14,6 +11,6 @@ const chanelSchema = new Schema({
 })
 
 
-const ChanelModel = model<IChanel>('Chanel', chanelSchema);
+const ChanelModel = model('Chanel', chanelSchema);
 
 export default ChanelModel;

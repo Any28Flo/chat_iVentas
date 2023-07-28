@@ -1,6 +1,6 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
 import { GraphQLError } from 'graphql'
-
+import mongoose from 'mongoose';
 import express from 'express';
 
 import { compare } from 'bcrypt';
@@ -38,6 +38,24 @@ export function buildApp(app: ReturnType<typeof express>) {
             //handle it with sessions
             return currentUser;
           },
+          getChanel: async (_, { owner }) => {
+
+            try {
+              const chanelData = await ChanelModel.find({ owner });
+              console.log(chanelData);
+
+              if (!chanelData) {
+                throw new Error("Create a chat first")
+              }
+
+              return {
+                name: "chanel"
+              }
+
+            } catch (error) {
+
+            }
+          }
 
         },
         Mutation: {
