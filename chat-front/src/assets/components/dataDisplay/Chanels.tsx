@@ -6,12 +6,13 @@ interface User {
 interface Chanels {
     id: string
     name: string,
-    members: User[]
+    members: User
 }
 interface ChanelProps {
-    chanels: Chanels
+    chanels: Chanels,
+    onClick: () => void
 }
-const Chanels = ({ chanels }: ChanelProps) => {
+const Chanels = ({ chanels, onClick }: ChanelProps) => {
     const { members } = chanels;
     return (
         <>
@@ -19,7 +20,7 @@ const Chanels = ({ chanels }: ChanelProps) => {
                 (members.length > 0) ?
 
                     members.map((member, index) => {
-                        return <Chanel key={`${member}-${index}`} username={member.username} />
+                        return <Chanel key={`${member}-${index}`} username={member.username} onClick={onClick} />
                     })
                     :
                     <h1>Sin contacto</h1>

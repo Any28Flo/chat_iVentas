@@ -8,11 +8,13 @@ import {
     AvatarBadge
 } from '@chakra-ui/react';
 interface ChanelProps {
-    username: string
+    username: string | undefined
+    onClick: () => void
+    id: string
 }
-const Chanel = ({ username }: ChanelProps) => {
+const Chanel = ({ username, onClick, id }: ChanelProps) => {
     return (
-        <Card maxW='md'>
+        <Card maxW='md' mb='4' onClick={(e) => onClick(id)}  >
             <CardHeader>
                 <Flex spacing='4'>
                     <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>

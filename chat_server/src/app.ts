@@ -1,5 +1,4 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
-import { GraphQLError } from 'graphql'
 import mongoose from 'mongoose';
 import express from 'express';
 
@@ -41,15 +40,25 @@ export function buildApp(app: ReturnType<typeof express>) {
           getChanel: async (_, { owner }) => {
 
             try {
-              const chanelData = await ChanelModel.find({ owner });
-              console.log(chanelData);
+              const objectId = new mongoose.Types.ObjectId(owner);
 
-              if (!chanelData) {
+              const chanel = await ChanelModel.findOne({ owner: objectId })
+              /**
+               * TODO:
+               * -debug why isn't working populate
+              */
+              if (!chanel) {
                 throw new Error("Create a chat first")
               }
 
               return {
-                name: "chanel"
+                _id: 'asdfa21',
+                name: "chanel",
+                members: [
+
+                  'adfads'
+
+                ]
               }
 
             } catch (error) {
@@ -88,14 +97,14 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             const { username, phone, email, password } = args;
             const user = new UserModel({ username, phone, email, password });
-            await user.save();
+            const userDB = await user.save();
             /**
              * TODO
              * - Add error handler
              * 
              */
             pubSub.publish("newUser", { newUser: user });
-            return user;
+            return userDB;
           },
           login: async (_, args, context) => {
 

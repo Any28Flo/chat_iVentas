@@ -6,6 +6,7 @@ export const typeDefs = `
     }
 
     type User {
+      _id: ID
       username: String!
       email: String!
       phone: String!
@@ -15,7 +16,7 @@ export const typeDefs = `
   
       name: String
       messages : [ID!] 
-      owner: ID
+      owner: [User]
       members : [ID]
     }
     type Message{

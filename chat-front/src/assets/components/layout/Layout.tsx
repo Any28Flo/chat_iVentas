@@ -12,7 +12,6 @@ import {
     Flex,
     IconButton,
     Image,
-    Link,
     useDisclosure,
 } from '@chakra-ui/react';
 
