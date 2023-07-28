@@ -11,6 +11,7 @@ import { pusher, } from './utils/pusher';
 import UserModel from './models/user.model';
 
 import config from './utils/config';
+import MessageModel from './models/message.model';
 
 
 
@@ -56,18 +57,29 @@ export function buildApp(app: ReturnType<typeof express>) {
 
         },
         Mutation: {
-          sendMessage(_, { from, message }, context) {
-            const chat = { id: chats.length + 1, from, message };
+          createMessage: async (_, args, context) => {
+            const { content } = args;
+            const message = new MessageModel({
+              content
+            })
+            try {
+              const messageSaved = await message.save();
+              /*pusher.trigger("my-channel", "create-message", {
+                content: content
+              });*/
+              return {
+                id: '23fADFADDF##$!"s',
+                content: messageSaved.content,
+                owner: '12e21'
+              }
 
-            chats.push(chat);
+            } catch (error) {
+              console.log(error);
 
-            pusher.trigger("my-channel", "my-event", {
-              message: message,
-              from: from,
-            });
+              throw new Error('Error create message');
 
+            }
             // pubSub.publish('my-channel', { messageSent: chat })
-            return chat
 
           },
           createUser: async (_, args, context) => {
