@@ -1,8 +1,12 @@
+
 export const typeDefs = `
     type Chat {
       id: ID!
-      owner: String!
-      content: String!
+      sender: ID! 
+      receiver: ID!
+      content: String! 
+      chanel: ID
+      created_at : String
     }
 
     type User {
@@ -19,13 +23,9 @@ export const typeDefs = `
       owner: ID!,
       member : User!
       messages :[Chat]
+      
     }
-    type Message{
-      content :String, 
-      owner : ID,
-      chanel : ID
-
-    }
+   
     type AuthPayload {
       user_info: User!
       token: String!
@@ -48,12 +48,12 @@ export const typeDefs = `
       chats: [Chat]
       hello: String
       me: User
-      getChanel(owner:ID):Chanel!
       getChanels(ownerId: ID) :ResponseGetChanels
-
+      getMessages(chanelId: ID, sortBy: String): [Chat]!
     }
+
     type Mutation{
-      createMessage(content: String!, owner: ID , chanel: ID): Chat
+      createMessage(content: String, sender: ID!, receiver: ID, chanel:ID): Chat
 
       createChanel(name:String, ownerId: ID, memberId:ID):Chanel
       

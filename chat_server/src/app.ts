@@ -37,34 +37,6 @@ export function buildApp(app: ReturnType<typeof express>) {
             //handle it with sessions
             return currentUser;
           },
-          getChanel: async (_, { owner }) => {
-
-            try {
-              //  const objectId = new mongoose.Types.ObjectId(owner);
-
-              const chanel = await ChanelModel.findById(owner)
-
-              log(chanel)
-
-              if (!chanel) {
-                throw new Error("Create a chat first")
-              }
-
-              return {
-                _id: chanel._id,
-                name: chanel.name,
-                owner: chanel.owner,
-                member: {
-                  _id: '123',
-                  username: "AFDFAdf"
-                }
-
-              }
-
-            } catch (error) {
-
-            }
-          },
           getChanels: async (_, { ownerId }) => {
             try {
 
@@ -83,16 +55,21 @@ export function buildApp(app: ReturnType<typeof express>) {
             } catch (error) {
 
             }
+          },
+          getMessages: async (_, { chanelId, sortBy = 'des' }) => {
+            const sort = sortBy === 'des' ? -1 : 1;
+            const messages = await MessageModel.find({ chanel: chanelId }).sort({ createdAt: sort })
+            log(messages)
+            return messages
           }
-
-
         },
         Mutation: {
           createMessage: async (_, args, context) => {
-            const { content, owner, chanel } = args;
+            const { content, sender, receiver, chanel } = args;
             const message = new MessageModel({
               content,
-              owner,
+              sender,
+              receiver,
               chanel
             })
             try {

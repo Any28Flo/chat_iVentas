@@ -4,11 +4,13 @@ import { gql } from '@apollo/client';
 export type Message = {
   content: string
   id: string,
-  from: string
+  sender: string,
+  receiver: string,
 }
 export type MessageProps = {
   message: Message
 }
+
 type Messages = {
   chats: Message[]
 }

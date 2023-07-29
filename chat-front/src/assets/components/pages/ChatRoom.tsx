@@ -87,22 +87,21 @@ const ChatRoom = () => {
         console.log(data);
 
     }
+
     const { loading, error, data } = useQuery(GET_CHANEL_BY_USER, {
         variables: { ownerId: user.id }
 
     });
-    if (data) {
-        console.log(data);
 
-    }
     const handleClick = (idChanel: string) => {
+        console.log(idChanel);
 
         setChanelActive(idChanel)
 
     }
     useEffect(() => {
         if (chanelActive) {
-            console.log(chanelActive);
+
         }
 
     }, [chanelActive])

@@ -13,10 +13,10 @@ import { ChanelProps } from '../../api/Chanel';
 
 
 const Chanels = ({ member, onClick }: ChanelProps) => {
-    const { username, id } = member;
+    const { username, _id } = member;
 
     return (
-        <Card maxW='md' mb='4' onClick={() => onClick(id)}  >
+        <Card maxW='md' mb='4' onClick={() => onClick(_id)}  >
             <CardHeader>
                 <Flex spacing='4'>
                     <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
