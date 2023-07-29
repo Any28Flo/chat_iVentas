@@ -5,6 +5,7 @@ const POST_LOGIN_QUERY = gql`
     login(email:$email, password:$password){
       token
       user_info {
+        _id
         username
         email
         phone

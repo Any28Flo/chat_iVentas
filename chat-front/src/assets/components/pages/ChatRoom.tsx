@@ -20,6 +20,7 @@ import { GET_CHANEL_BY_USER } from "../../../api/chanels";
 
 import Chanel from "../dataDisplay/Chanel";
 import AddNewMessage from '../Message/AddNewMessage';
+import { useAppContext } from '../../context/appContext';
 
 
 const messagesArray = [
@@ -65,6 +66,9 @@ const initState = [
 
 ];
 const ChatRoom = () => {
+    const { user } = useAppContext();
+    console.log(user);
+
 
     const [chanels, setChanels] = useState(initState);
     const [chanelActive, setChanelActive] = useState();

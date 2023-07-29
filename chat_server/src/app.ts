@@ -112,7 +112,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             try {
               const user = await UserModel.findOne({ email });
-
+              console.log(user)
               if (!user) {
                 throw new Error('Invalid email or password');
               }

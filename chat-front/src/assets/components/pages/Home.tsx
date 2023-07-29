@@ -22,21 +22,22 @@ const Home = () => {
         login(
             {
                 variables: { email: email.value, password: password.value }
-                , onCompleted: (data) => {
+                , onCompleted: ({ login }) => {
+
                     dispatch({
                         type: 'login',
                         payload: {
-                            token: data.token,
+                            token: login.token,
                             user: {
-                                id: data.id,
-                                email: data.email,
-                                phone: data.phone,
-                                username: data.username
+                                id: login.user_info._id,
+                                email: login.user_info.email,
+                                phone: login.user_info.phone,
+                                username: login.user_info.username
                             }
                         }
                     })
 
-                    // localStorage.setItem('USER', JSON.stringify(user));
+                    localStorage.setItem('USER', JSON.stringify(login));
                     navigate("/chat-room");
                 }
             },);

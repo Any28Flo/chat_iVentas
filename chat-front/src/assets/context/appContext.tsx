@@ -44,10 +44,10 @@ type Props = {
 };
 export function AppProvider({ children }: Props) {
 
-    const [{ user, loading }, dispatch] = useReducer(reducer, initialState);
+    const [{ user, token }, dispatch] = useReducer(reducer, initialState);
 
     return (
-        <AppContext.Provider value={{ user, loading, dispatch }} >
+        <AppContext.Provider value={{ user, token, dispatch }} >
             {children}
         </AppContext.Provider>
     );
