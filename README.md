@@ -32,6 +32,9 @@ If you have trouble with any of these, learn more about the PATH environment
 variable and how to fix it here for [windows][win-path] or
 [mac/linux][mac-path].
 
+# Branchs
+- main : The deploy branch
+- develop : The develop branch
 ## Demo
 
 Hosted on [link](#)
