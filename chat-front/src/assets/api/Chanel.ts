@@ -1,13 +1,16 @@
 import { gql } from "@apollo/client";
 import { User } from "./User";
 
-interface Chanel {
+export interface Chanel {
     id: string
     name: string,
-    member?: User
+    member: User
 };
 
-export type ChanelType = Chanel[]
+export type ChanelType = {
+    chanels: Chanel[],
+    numChanels: Number
+}
 
 export type ChanelProps = {
     member: User,
@@ -16,12 +19,21 @@ export type ChanelProps = {
 
 
 const GET_CHANEL_BY_USER = gql`
-query chanels($owner: ID){
-   getChanel(owner:$owner){
-        name
+query getChanels($ownerId: ID){
+  getChanels(ownerId:$ownerId){
+    chanels{
+      id
+      name
+      owner
+      member{
+        _id
+        username
+      }
+     
     }
+    numChanels
   }
-
+}
 `;
 
 export {
