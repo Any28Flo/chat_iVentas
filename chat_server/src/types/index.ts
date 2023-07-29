@@ -10,6 +10,7 @@ export const typeDefs = `
       username: String!
       email: String!
       phone: String!
+      password: String!
     }
     
     type Chanel{
@@ -28,8 +29,8 @@ export const typeDefs = `
     type AuthPayload {
       user_info: User!
       token: String!
-  
     }
+
     type LoginData {
       password: String,
       email: String
@@ -39,14 +40,11 @@ export const typeDefs = `
       message: String!
     }
     
-    union Login = AuthPayload | Error
     
-  
-  
     type Query {
       chats: [Chat]
       hello: String
-      me: User # Get the currently logged-in user
+      me: User
       getChanel(owner:ID):Chanel!
 
     }
@@ -54,6 +52,8 @@ export const typeDefs = `
       createMessage(content: String!, owner: ID , chanel: ID): Chat
 
       createChanel(name:String, owner: ID, member:[ID]):Chanel
+      
+      
       createUser(username: String! email: String!,phone: String!, password: String!): User!
       login(email: String!, password: String!):AuthPayload 
     

@@ -1,20 +1,19 @@
 import { useNavigate } from "react-router-dom";
 
-import { POST_LOGIN_QUERY } from "../../../api/user";
 import { useMutation } from "@apollo/client";
 import FormLogin from "../FormLogin";
+import { useAppContext } from "../../context/appContext";
+import { POST_LOGIN_QUERY } from "../../api/User";
 
 
 
 
 const Home = () => {
+    const { dispatch } = useAppContext();
+
     const [login, { loading, error }] = useMutation(POST_LOGIN_QUERY,);
     const navigate = useNavigate();
-    /**
-     * 
-     * TODO:
-     * - add dat context
-     */
+
     function onSubmit(e) {
         e.preventDefault();
 
@@ -23,17 +22,22 @@ const Home = () => {
         login(
             {
                 variables: { email: email.value, password: password.value }
-                , onCompleted: (data) => {
-                    console.log(data);
-                    const user = {
-                        token: data.token,
-                        data: {
-                            email: data.email,
-                            phone: data.phone,
-                            username: data.username
+                , onCompleted: ({ login }) => {
+
+                    dispatch({
+                        type: 'login',
+                        payload: {
+                            token: login.token,
+                            user: {
+                                id: login.user_info._id,
+                                email: login.user_info.email,
+                                phone: login.user_info.phone,
+                                username: login.user_info.username
+                            }
                         }
-                    }
-                    localStorage.setItem('USER', JSON.stringify(user));
+                    })
+
+                    localStorage.setItem('USER', JSON.stringify(login));
                     navigate("/chat-room");
                 }
             },);

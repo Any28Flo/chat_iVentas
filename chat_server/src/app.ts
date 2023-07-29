@@ -112,7 +112,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             try {
               const user = await UserModel.findOne({ email });
-
+              console.log(user)
               if (!user) {
                 throw new Error('Invalid email or password');
               }
@@ -124,11 +124,12 @@ export function buildApp(app: ReturnType<typeof express>) {
                 throw new Error('Invalid email or password');
               }
 
-              const token = sign({ userId: user.email }, config.BCRYPT_HASH);
+              const token = sign({ userId: user._id }, config.BCRYPT_HASH);
 
               const userData = {
 
                 user_info: {
+                  _id: user._id,
                   username: user.username,
                   email: user.email,
                   phone: user.phone
