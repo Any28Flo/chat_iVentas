@@ -2,13 +2,18 @@ import { createContext, useContext, useReducer, ReactNode } from 'react';
 import { User } from '../api/User';
 
 type State = {
-    user: undefined | User | {};
+    user: User;
     token: String;
 };
 
 const initialState: State = {
     token: '',
-    user: undefined
+    user: {
+        id: '',
+        username: '',
+        email: '',
+        phone: ''
+    }
 };
 
 type Action =

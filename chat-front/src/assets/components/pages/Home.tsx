@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-import { POST_LOGIN_QUERY } from "../../../api/user";
 import { useMutation } from "@apollo/client";
 import FormLogin from "../FormLogin";
 import { useAppContext } from "../../context/appContext";
+import { POST_LOGIN_QUERY } from "../../api/User";
 
 
 
