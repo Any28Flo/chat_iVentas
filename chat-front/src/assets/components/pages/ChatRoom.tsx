@@ -6,7 +6,7 @@ import { Grid, GridItem } from '@chakra-ui/react';
 
 import AddNewMessage from '../Message/AddNewMessage';
 import { useAppContext } from '../../context/appContext';
-import { ChanelType, GET_CHANEL_BY_USER } from '../../api/Chanel';
+import { Chanel, ChanelType, GET_CHANEL_BY_USER } from '../../api/Chanel';
 
 import Chanels from '../dataDisplay/Chanels';
 import Chat from "../dataDisplay/Chat";
@@ -41,41 +41,43 @@ const messagesArray = [
 
     }
 ]
-const initState = [
-    {
-        id: '123',
-        name: 'my-chanel',
-        member:
-
+const initState = {
+    chanels: [
         {
-            username: 'Robin',
-            id: '12asdf',
-            email: 'sdfasdf',
-            phone: '123'
-        }
+            id: '123',
+            name: 'my-chanel',
+            member:
+
+            {
+                username: 'Robin',
+                id: '12asdf',
+                email: 'sdfasdf',
+                phone: '123'
+            }
 
 
-    },
-    {
-        id: '321',
-        name: 'my-chanel-2',
-        member:
-
+        },
         {
-            username: 'wonder woman',
-            id: 'asdf21',
-            email: 'sdfasdf',
-            phone: '123'
+            id: '321',
+            name: 'my-chanel-2',
+            member:
 
-        }
-    },
+            {
+                username: 'wonder woman',
+                id: 'asdf21',
+                email: 'sdfasdf',
+                phone: '123'
 
-];
+            }
+        },
+
+    ],
+    numChanels: 2
+}
 type chanelActiveType = string | undefined
 const ChatRoom = () => {
 
     const { user } = useAppContext();
-
 
     const [chanels, setChanels] = useState<ChanelType>(initState)
     const [chanelActive, setChanelActive] = useState<chanelActiveType>(undefined);
@@ -86,12 +88,13 @@ const ChatRoom = () => {
 
     }
     const { loading, error, data } = useQuery(GET_CHANEL_BY_USER, {
-        variables: { owner: user.id }
+        variables: { ownerId: user.id }
 
     });
+    if (data) {
+        console.log(data);
 
-
-
+    }
     const handleClick = (idChanel: string) => {
 
         setChanelActive(idChanel)
@@ -103,6 +106,7 @@ const ChatRoom = () => {
         }
 
     }, [chanelActive])
+
 
     return (
         <Grid
@@ -116,11 +120,12 @@ const ChatRoom = () => {
         >
             <GridItem pl='2' area={'nav'}>
                 {
-                    initState.length === 0 ? (<p>Array is empty.</p>) :
-                        (initState.map(chanel => {
+                    data ?
+                        (data.getChanels.chanels.map((chanel: Chanel) => {
                             return <Chanels key={chanel.id} member={chanel.member} onClick={handleClick} />
 
                         }))
+                        : ''
                 }
             </GridItem>
             <GridItem pl='2' bg='green.300' area={'main'} width="100%" >

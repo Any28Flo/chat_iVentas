@@ -14,11 +14,11 @@ export const typeDefs = `
     }
     
     type Chanel{
-  
+      id: ID
       name: String
-      messages : [ID!] 
-      owner: [User]
-      members : [ID]
+      owner: ID!,
+      member : User!
+      messages :[Chat]
     }
     type Message{
       content :String, 
@@ -40,21 +40,26 @@ export const typeDefs = `
       message: String!
     }
     
-    
+    type ResponseGetChanels {
+        chanels : [Chanel]!
+        numChanels : Int
+    }
     type Query {
       chats: [Chat]
       hello: String
       me: User
       getChanel(owner:ID):Chanel!
+      getChanels(ownerId: ID) :ResponseGetChanels
 
     }
     type Mutation{
       createMessage(content: String!, owner: ID , chanel: ID): Chat
 
-      createChanel(name:String, owner: ID, member:[ID]):Chanel
+      createChanel(name:String, ownerId: ID, memberId:ID):Chanel
       
       
       createUser(username: String! email: String!,phone: String!, password: String!): User!
+      
       login(email: String!, password: String!):AuthPayload 
     
 
