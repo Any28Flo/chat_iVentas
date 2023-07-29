@@ -40,31 +40,51 @@ export function buildApp(app: ReturnType<typeof express>) {
           getChanel: async (_, { owner }) => {
 
             try {
-              const objectId = new mongoose.Types.ObjectId(owner);
+              //  const objectId = new mongoose.Types.ObjectId(owner);
 
-              const chanel = await ChanelModel.findOne({ owner: objectId })
-              /**
-               * TODO:
-               * -debug why isn't working populate
-              */
+              const chanel = await ChanelModel.findById(owner)
+
+              log(chanel)
+
               if (!chanel) {
                 throw new Error("Create a chat first")
               }
 
               return {
-                _id: 'asdfa21',
-                name: "chanel",
-                members: [
+                _id: chanel._id,
+                name: chanel.name,
+                owner: chanel.owner,
+                member: {
+                  _id: '123',
+                  username: "AFDFAdf"
+                }
 
-                  'adfads'
+              }
 
-                ]
+            } catch (error) {
+
+            }
+          },
+          getChanels: async (_, { ownerId }) => {
+            try {
+
+              // Find users by their IDs
+              const chanels = await ChanelModel.find({ owner: ownerId }).populate('member')
+
+              log(chanels)
+
+
+              return {
+                chanels: chanels,
+                numChanels: 12
+
               }
 
             } catch (error) {
 
             }
           }
+
 
         },
         Mutation: {
@@ -145,28 +165,35 @@ export function buildApp(app: ReturnType<typeof express>) {
 
           },
           createChanel: async (_, args, context) => {
-            const { name, owner } = args;
+            const { name, ownerId, memberId } = args;
 
             try {
               const chanelExist = await ChanelModel.findOne({ name: name })
               if (chanelExist) {
                 throw new Error('Chanel name must be unique')
               }
+              const owner = await UserModel.findById(ownerId);
 
-              const chanel = new ChanelModel({ name, owner });
+              if (!owner) {
+                throw new Error('Chanel name must be unique')
+              }
+              const member = await UserModel.findById(memberId);
 
-              const newChanel = await chanel.save();
-              /**
-               * 
-               * TODO:
-               * - handle validation chanel-name unique
-               */
+              if (!member) {
+                throw new Error('Chanel name must be unique')
+              }
+              const newChanel = new ChanelModel({ name, owner: owner._id, member: member._id },);
+
+
+              const responseChanel = await newChanel.save()
+
 
               return {
-                name: newChanel.name
+                id: responseChanel._id,
+                name: responseChanel.name,
+                owner: responseChanel.owner,
+                member: responseChanel.member
               }
-
-
 
             } catch (error) {
 
@@ -178,7 +205,7 @@ export function buildApp(app: ReturnType<typeof express>) {
              */
             //pubSub.publish("newUser", { newUser: user });
 
-          }
+          },
 
         },
         Subscription: {
