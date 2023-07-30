@@ -45,7 +45,7 @@ export const typeDefs = `
       chats: [Chat]
       hello: String
       me: User
-      getChanels(ownerId: ID) :ResponseGetChanels
+      getChanels(userId: ID) :ResponseGetChanels
       getMessages(chanelId: ID, sortBy: String): [Chat]!
     }
 

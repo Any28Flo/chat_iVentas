@@ -41,7 +41,7 @@ export function buildApp(app: ReturnType<typeof express>) {
             try {
 
               // Find users by their IDs
-              const chanels = await ChanelModel.find({ participants: { $in: [userId] } });
+              const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
 
 
               return {
