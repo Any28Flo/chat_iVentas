@@ -13,24 +13,21 @@ export type ChanelType = {
 }
 
 export type ChanelProps = {
-  member: User,
+  participants: User[],
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   id: string
 }
 
 
 const GET_CHANEL_BY_USER = gql`
-query getChanels($ownerId: ID){
-  getChanels(ownerId:$ownerId){
+query getChanels($userId: ID){
+  getChanels(userId: $userId){
     chanels{
-      id
       name
-      owner
-      member{
-        _id
+      id
+      participants{
         username
       }
-     
     }
     numChanels
   }

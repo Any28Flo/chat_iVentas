@@ -90,13 +90,8 @@ const ChatRoom = () => {
     }
 
     const { loading, error, data: chanelData } = useQuery(GET_CHANEL_BY_USER, {
-        variables: { ownerId: user.id }
+        variables: { userId: user.id }
     });
-
-    // });
-    // const { data, isLoading, error, refetch } = useQuery('myData', fetchData, {
-    //     enabled: false,
-    //   });
 
     const { loading: loadMsg, error: errorsMsg, data: chatsData, refetch } = useQuery(GET_MESSAGES_QUERY, {
         variables: { chanelId: chanelActive }
@@ -121,7 +116,8 @@ const ChatRoom = () => {
                 {
                     chanelData ?
                         (chanelData.getChanels.chanels.map((chanel: Chanel) => {
-                            return <Chanels key={chanel.id} member={chanel.member} onClick={handleClick} id={chanel.id} />
+                            console.log(chanel)
+                            return <Chanels key={chanel.id} participants={chanel.participants} onClick={handleClick} id={chanel.id} />
 
                         }))
                         : ''

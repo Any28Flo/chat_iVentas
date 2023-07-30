@@ -41,8 +41,39 @@ export function buildApp(app: ReturnType<typeof express>) {
             try {
 
               // Find users by their IDs
-              const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
-
+              //const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
+              const chanels = ChanelModel.aggregate([
+                {
+                  $lookup: {
+                    from: 'users',
+                    let: { participants: '$participants' },
+                    pipeline: [
+                      {
+                        $match: {
+                          $expr: {
+                            $and: [
+                              { $in: ['$_id', '$$participants'] },
+                              { $ne: ['$_id', new mongoose.Types.ObjectId(userId)] },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                    as: 'participantsData',
+                  },
+                },
+                {
+                  $unwind: '$participantsData',
+                },
+                {
+                  $group: {
+                    _id: '$_id',
+                    name: { $first: '$name' },
+                    participants: { $push: '$participantsData' },
+                    // Other fields from the channels collection can be included in the $group stage if needed
+                  },
+                },
+              ]);
 
               return {
                 chanels: chanels,

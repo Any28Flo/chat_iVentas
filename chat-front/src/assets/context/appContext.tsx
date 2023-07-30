@@ -9,7 +9,7 @@ type State = {
 const initialState: State = {
     token: '',
     user: {
-        id: '',
+        id: '64c392276849dc34c2a092e7',
         username: '',
         email: '',
         phone: ''

@@ -3,7 +3,6 @@ export const typeDefs = `
     type Chat {
       id: ID!
       sender: ID! 
-      receiver: ID!
       content: String! 
       chanel: ID
       created_at : String
@@ -50,7 +49,7 @@ export const typeDefs = `
     }
 
     type Mutation{
-      createMessage(content: String, sender: ID!, receiver: ID, chanel:ID): Chat
+      createMessage(content: String, sender: ID!, chanel:ID): Chat
 
       createChanel(name:String,participants:[ID!]):Chanel
       
