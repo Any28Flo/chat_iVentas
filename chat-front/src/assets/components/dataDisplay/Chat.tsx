@@ -5,7 +5,7 @@ import {
     Text
 } from '@chakra-ui/react';
 
-import { MessageProps } from '../../api/Message';
+import { MessageProps } from '../../api/Chat';
 
 const Chat = ({ message }: MessageProps) => {
 

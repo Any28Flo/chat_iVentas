@@ -10,6 +10,7 @@ import { Chanel, ChanelType, GET_CHANEL_BY_USER } from '../../api/Chanel';
 
 import Chanels from '../dataDisplay/Chanels';
 import Chat from "../dataDisplay/Chat";
+import { GET_MESSAGES_QUERY } from "../../api/Chat";
 
 
 const messagesArray = [
@@ -88,24 +89,23 @@ const ChatRoom = () => {
 
     }
 
-    const { loading, error, data } = useQuery(GET_CHANEL_BY_USER, {
+    const { loading, error, data: chanelData } = useQuery(GET_CHANEL_BY_USER, {
         variables: { ownerId: user.id }
-
     });
 
-    const handleClick = (idChanel: string) => {
-        console.log(idChanel);
+    // });
+    // const { data, isLoading, error, refetch } = useQuery('myData', fetchData, {
+    //     enabled: false,
+    //   });
 
+    const { loading: loadMsg, error: errorsMsg, data: chatsData, refetch } = useQuery(GET_MESSAGES_QUERY, {
+        variables: { chanelId: chanelActive }
+    });
+    const handleClick = (idChanel: string) => {
         setChanelActive(idChanel)
+        refetch({ chanelId: idChanel })
 
     }
-    useEffect(() => {
-        if (chanelActive) {
-
-        }
-
-    }, [chanelActive])
-
 
     return (
         <Grid
@@ -119,9 +119,9 @@ const ChatRoom = () => {
         >
             <GridItem pl='2' area={'nav'}>
                 {
-                    data ?
-                        (data.getChanels.chanels.map((chanel: Chanel) => {
-                            return <Chanels key={chanel.id} member={chanel.member} onClick={handleClick} />
+                    chanelData ?
+                        (chanelData.getChanels.chanels.map((chanel: Chanel) => {
+                            return <Chanels key={chanel.id} member={chanel.member} onClick={handleClick} id={chanel.id} />
 
                         }))
                         : ''
@@ -132,8 +132,8 @@ const ChatRoom = () => {
                     chanelActive ?
                         <>
                             {
-                                messages.length !== 0 ?
-                                    (messages.map(message => <Chat key={message.id} message={message} />))
+                                chatsData.getMessages.length !== 0 ?
+                                    (chatsData.getMessages.map(message => <Chat key={message.id} message={message} />))
                                     : ""
                             }
                             {

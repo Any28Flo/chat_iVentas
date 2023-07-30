@@ -37,13 +37,11 @@ export function buildApp(app: ReturnType<typeof express>) {
             //handle it with sessions
             return currentUser;
           },
-          getChanels: async (_, { ownerId }) => {
+          getChanels: async (_, { userId }) => {
             try {
 
               // Find users by their IDs
-              const chanels = await ChanelModel.find({ owner: ownerId }).populate('member')
-
-              log(chanels)
+              const chanels = await ChanelModel.find({ participants: { $in: [userId] } });
 
 
               return {
@@ -142,24 +140,15 @@ export function buildApp(app: ReturnType<typeof express>) {
 
           },
           createChanel: async (_, args, context) => {
-            const { name, ownerId, memberId } = args;
+            const { name, participants } = args;
 
             try {
               const chanelExist = await ChanelModel.findOne({ name: name })
               if (chanelExist) {
                 throw new Error('Chanel name must be unique')
               }
-              const owner = await UserModel.findById(ownerId);
 
-              if (!owner) {
-                throw new Error('Chanel name must be unique')
-              }
-              const member = await UserModel.findById(memberId);
-
-              if (!member) {
-                throw new Error('Chanel name must be unique')
-              }
-              const newChanel = new ChanelModel({ name, owner: owner._id, member: member._id },);
+              const newChanel = new ChanelModel({ name: name, participants: participants },);
 
 
               const responseChanel = await newChanel.save()
@@ -167,9 +156,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
               return {
                 id: responseChanel._id,
-                name: responseChanel.name,
-                owner: responseChanel.owner,
-                member: responseChanel.member
+                name: responseChanel.name
               }
 
             } catch (error) {

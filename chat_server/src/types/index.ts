@@ -20,10 +20,7 @@ export const typeDefs = `
     type Chanel{
       id: ID
       name: String
-      owner: ID!,
-      member : User!
-      messages :[Chat]
-      
+      participants: [User]!
     }
    
     type AuthPayload {
@@ -55,7 +52,7 @@ export const typeDefs = `
     type Mutation{
       createMessage(content: String, sender: ID!, receiver: ID, chanel:ID): Chat
 
-      createChanel(name:String, ownerId: ID, memberId:ID):Chanel
+      createChanel(name:String,participants:[ID!]):Chanel
       
       
       createUser(username: String! email: String!,phone: String!, password: String!): User!
