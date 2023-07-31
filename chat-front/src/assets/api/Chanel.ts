@@ -1,35 +1,34 @@
 import { gql } from "@apollo/client";
 import { User } from "./User";
-
+import React from "react";
 export interface Chanel {
-    id: string
-    name: string,
-    member: User
+  _id: string
+  name: string,
+  participants: User[]
 };
 
 export type ChanelType = {
-    chanels: Chanel[],
-    numChanels: Number
+  chanels: Chanel[],
+  numChanels: Number
 }
 
 export type ChanelProps = {
-    member: User,
-    onClick: () => string
+  participants: User[],
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  idChanel: string
 }
 
 
 const GET_CHANEL_BY_USER = gql`
-query getChanels($ownerId: ID){
-  getChanels(ownerId:$ownerId){
+query getChanels($userId: ID){
+  getChanels(userId: $userId){
     chanels{
-      id
       name
-      owner
-      member{
-        _id
+      _id
+      participants{
         username
+        _id
       }
-     
     }
     numChanels
   }
@@ -37,5 +36,5 @@ query getChanels($ownerId: ID){
 `;
 
 export {
-    GET_CHANEL_BY_USER
+  GET_CHANEL_BY_USER
 }

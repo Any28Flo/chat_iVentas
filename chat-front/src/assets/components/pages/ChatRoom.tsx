@@ -1,112 +1,84 @@
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
 import { Grid, GridItem } from '@chakra-ui/react';
 
 import AddNewMessage from '../Message/AddNewMessage';
 import { useAppContext } from '../../context/appContext';
-import { Chanel, ChanelType, GET_CHANEL_BY_USER } from '../../api/Chanel';
-
+import { Chanel, GET_CHANEL_BY_USER } from '../../api/Chanel';
+import { ChatType } from "../../api/Chat";
 import Chanels from '../dataDisplay/Chanels';
+
+import { GET_MESSAGES_QUERY, SEND_MESSAGE } from "../../api/Chat";
 import Chat from "../dataDisplay/Chat";
 
 
-const messagesArray = [
-    {
-        id: "ase123",
-        content: 'hello',
-        chanel: 'my-chanel-2',
-        owner: {
-            username: 'Batman',
-            id: 'asdf21',
-            email: 'sdfasdf',
-            phone: '123'
-        },
-        from: "Batman"
+import Pusher from 'pusher-js'
 
-    },
-    {
-        id: "ase124",
-        content: 'hello Batman',
-        chanel: 'my-chanel-2',
-        owner: {
-            username: 'wonder woman',
-            id: 'asdf21',
-            email: 'sdfasdf',
-            phone: '123'
+type chanelActiveType = string;
 
-        },
-        from: "Wonder woman"
-
-    }
-]
-const initState = {
-    chanels: [
-        {
-            id: '123',
-            name: 'my-chanel',
-            member:
-
-            {
-                username: 'Robin',
-                id: '12asdf',
-                email: 'sdfasdf',
-                phone: '123'
-            }
-
-
-        },
-        {
-            id: '321',
-            name: 'my-chanel-2',
-            member:
-
-            {
-                username: 'wonder woman',
-                id: 'asdf21',
-                email: 'sdfasdf',
-                phone: '123'
-
-            }
-        },
-
-    ],
-    numChanels: 2
-}
-type chanelActiveType = string | undefined
 const ChatRoom = () => {
 
     const { user } = useAppContext();
 
-    const [chanels, setChanels] = useState<ChanelType>(initState)
-    const [chanelActive, setChanelActive] = useState<chanelActiveType>(undefined);
-    const [messages, setMessages] = useState(messagesArray)
 
-    const handleSend = (data: string) => {
-        console.log(data);
+    const [chanelActive, setChanelActive] = useState<chanelActiveType>('');
+    const [messages, setMessages] = useState([]);
 
-    }
-    const { loading, error, data } = useQuery(GET_CHANEL_BY_USER, {
-        variables: { ownerId: user.id }
+
+    const { loading, error, data: chanelData } = useQuery(GET_CHANEL_BY_USER, {
+        variables: { userId: user.id }
+    });
+
+    const { loading: loadMsg, error: errorsMsg, data: chatsData, refetch } = useQuery(GET_MESSAGES_QUERY, {
+        variables: { chanelId: chanelActive }
 
     });
-    if (data) {
-        console.log(data);
+    const [sendMessage, { data }] = useMutation(SEND_MESSAGE);
+
+
+    const handleSend = (data: string) => {
+        sendMessage({
+            variables: { content: data, sender: user.id, chanel: chanelActive }
+        })
+        //setMessages((prev) => prev + 1);
 
     }
+    console.log(chatsData);
+
     const handleClick = (idChanel: string) => {
-
         setChanelActive(idChanel)
-
     }
+
     useEffect(() => {
-        if (chanelActive) {
-            console.log(chanelActive);
+        if (chanelActive !== '') {
+            refetch({ chanelId: chanelActive })
+
         }
 
     }, [chanelActive])
 
+    useEffect(() => {
+
+
+        const pusher = new Pusher('', {
+            cluster: ''
+        });
+
+        const channel = pusher.subscribe('my-channel');
+        console.log(channel);
+        Pusher.logToConsole = true;
+        channel.bind('new-message', (data) => {
+            console.log("Chanel" + data);
+
+        })
+
+        return () => {
+            pusher.unsubscribe('my-channel');
+            pusher.disconnect();
+        };
+    }, [])
 
     return (
         <Grid
@@ -120,9 +92,9 @@ const ChatRoom = () => {
         >
             <GridItem pl='2' area={'nav'}>
                 {
-                    data ?
-                        (data.getChanels.chanels.map((chanel: Chanel) => {
-                            return <Chanels key={chanel.id} member={chanel.member} onClick={handleClick} />
+                    chanelData ?
+                        (chanelData.getChanels.chanels.map((chanel: Chanel, index) => {
+                            return <Chanels key={`chanels-${index}`} participants={chanel.participants} onClick={handleClick} idChanel={chanel._id} />
 
                         }))
                         : ''
@@ -130,20 +102,29 @@ const ChatRoom = () => {
             </GridItem>
             <GridItem pl='2' bg='green.300' area={'main'} width="100%" >
                 {
-                    chanelActive ?
+                    chatsData && chanelActive !== '' ?
                         <>
+                            <h1>DSD</h1>
                             {
-                                messages.length !== 0 ?
-                                    (messages.map(message => <Chat key={message.id} message={message} />))
+                                chatsData.getMessages.length !== 0 ?
+                                    chatsData.getMessages.map((message, idx) => {
+                                        console.log(message);
+
+                                        return <Chat key={`message-${idx}`} data={message} />
+                                    })
                                     : ""
                             }
                             {
                                 <AddNewMessage onSend={handleSend} />
                             }
 
-                        </> : ""
+
+                        </>
+                        : ""
 
                 }
+
+
 
 
             </GridItem>

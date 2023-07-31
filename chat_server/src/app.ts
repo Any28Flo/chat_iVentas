@@ -1,5 +1,5 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 import express from 'express';
 
 import { compare } from 'bcrypt';
@@ -13,9 +13,17 @@ import config from './utils/config';
 import MessageModel from './models/message.model';
 import ChanelModel from './models/chanel.model';
 import { log } from 'console';
+import Pusher from 'pusher';
 
+import { PubSub } from 'graphql-subscriptions';
 
-const pubSub = createPubSub();
+const pubsub = new PubSub();
+export interface Context {
+  request: any;
+  response: any;
+  connection: any;
+  pusher: Pusher;
+}
 
 export function buildApp(app: ReturnType<typeof express>) {
   const yoga = createYoga({
@@ -37,42 +45,52 @@ export function buildApp(app: ReturnType<typeof express>) {
             //handle it with sessions
             return currentUser;
           },
-          getChanel: async (_, { owner }) => {
-
-            try {
-              //  const objectId = new mongoose.Types.ObjectId(owner);
-
-              const chanel = await ChanelModel.findById(owner)
-
-              log(chanel)
-
-              if (!chanel) {
-                throw new Error("Create a chat first")
-              }
-
-              return {
-                _id: chanel._id,
-                name: chanel.name,
-                owner: chanel.owner,
-                member: {
-                  _id: '123',
-                  username: "AFDFAdf"
-                }
-
-              }
-
-            } catch (error) {
-
-            }
-          },
-          getChanels: async (_, { ownerId }) => {
+          getChanels: async (_, { userId }) => {
             try {
 
               // Find users by their IDs
-              const chanels = await ChanelModel.find({ owner: ownerId }).populate('member')
+              //const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
+              const chanels = await await ChanelModel.aggregate([
+                {
+                  $lookup: {
+                    from: 'users',
+                    let: { participants: '$participants' },
+                    pipeline: [
+                      {
+                        $match: {
+                          $expr: {
+                            $and: [
+                              { $in: ['$_id', '$$participants'] },
+                              { $ne: ['$_id', new Types.ObjectId(userId)] },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                    as: 'participantsData',
+                  },
+                },
+                {
+                  $unwind: '$participantsData',
+                },
+                {
+                  $group: {
+                    _id: '$_id',
+                    name: { $first: '$name' },
+                    participants: { $push: '$participantsData' },
+                    // Other fields from the channels collection can be included in the $group stage if needed
+                  },
+                },
+                {
+                  $project: {
 
-              log(chanels)
+                    name: 1,
+                    participants: 1,
+                  },
+                },
 
+
+              ]);
 
               return {
                 chanels: chanels,
@@ -83,33 +101,34 @@ export function buildApp(app: ReturnType<typeof express>) {
             } catch (error) {
 
             }
+          },
+          getMessages: async (_, { chanelId, sortBy = 'des' }) => {
+            const sort = sortBy === 'des' ? -1 : 1;
+            const messages = await MessageModel.find({ chanel: chanelId }).sort({ createdAt: sort }).limit(20);
+            log(messages)
+            return messages
           }
-
-
         },
         Mutation: {
-          createMessage: async (_, args, context) => {
-            const { content, owner, chanel } = args;
+          createMessage: async (_, args, context: Context) => {
+            const { content, sender, chanel } = args;
+            log(args)
             const message = new MessageModel({
               content,
-              owner,
+              sender,
               chanel
             })
-            try {
 
-              const messageSaved = await message.save();
-              /*pusher.trigger("my-channel", "create-message", {
-                content: content
-              });*/
 
-              return messageSaved
+            const messageSaved = await message.save();
 
-            } catch (error) {
-              console.log(error);
+            //await pusher.trigger('my-channel', 'client-new-message', { message: content })
+            // pusher.trigger('my-channel', 'client-new-message', args);
+            // context.pusher.trigger('my-channel', 'client-new-message', args);
 
-              throw new Error('Error create message');
+            pusher.trigger('my-channel', 'new-message', messageSaved)
+            return messageSaved
 
-            }
             // pubSub.publish('my-channel', { messageSent: chat })
 
           },
@@ -123,7 +142,7 @@ export function buildApp(app: ReturnType<typeof express>) {
              * - Add error handler
              * 
              */
-            pubSub.publish("newUser", { newUser: user });
+            //  pubSub.publish("newUser", { newUser: user });
             return userDB;
           },
           login: async (_, args, context) => {
@@ -132,7 +151,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             try {
               const user = await UserModel.findOne({ email });
-              console.log(user)
+
               if (!user) {
                 throw new Error('Invalid email or password');
               }
@@ -165,24 +184,15 @@ export function buildApp(app: ReturnType<typeof express>) {
 
           },
           createChanel: async (_, args, context) => {
-            const { name, ownerId, memberId } = args;
+            const { name, participants } = args;
 
             try {
               const chanelExist = await ChanelModel.findOne({ name: name })
               if (chanelExist) {
                 throw new Error('Chanel name must be unique')
               }
-              const owner = await UserModel.findById(ownerId);
 
-              if (!owner) {
-                throw new Error('Chanel name must be unique')
-              }
-              const member = await UserModel.findById(memberId);
-
-              if (!member) {
-                throw new Error('Chanel name must be unique')
-              }
-              const newChanel = new ChanelModel({ name, owner: owner._id, member: member._id },);
+              const newChanel = new ChanelModel({ name: name, participants: participants },);
 
 
               const responseChanel = await newChanel.save()
@@ -190,9 +200,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
               return {
                 id: responseChanel._id,
-                name: responseChanel.name,
-                owner: responseChanel.owner,
-                member: responseChanel.member
+                name: responseChanel.name
               }
 
             } catch (error) {
@@ -208,17 +216,10 @@ export function buildApp(app: ReturnType<typeof express>) {
           },
 
         },
-        Subscription: {
-          messageSent: {
-            subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
 
-          }
-        }
       }
     }),
-    context: ({ request }) => {
-      request
-    }
+
   })
   app.use(yoga.graphqlEndpoint, yoga);
 

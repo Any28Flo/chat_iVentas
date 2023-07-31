@@ -5,16 +5,16 @@ import {
     Text
 } from '@chakra-ui/react';
 
-import { MessageProps } from '../../api/Message';
+import { MessageProps } from '../../api/Chat';
 
-const Chat = ({ message }: MessageProps) => {
-
+const Chat = ({ data }: MessageProps) => {
+    const { content } = data;
     return (
         <Card maxW='md' mb='4'   >
             <Flex spacing='4'>
                 <Avatar
                     name="Computer"
-                    src="https://avataaars.io/?avatarStyle=Transparent&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
+                    src=""
                     bg="blue.300"
                 ></Avatar>
                 <Flex
@@ -24,7 +24,7 @@ const Chat = ({ message }: MessageProps) => {
                     p="3"
                     width="100%"
                 >
-                    <Text>{message.content}</Text>
+                    <Text>{content}</Text>
                 </Flex>
             </Flex>
 
