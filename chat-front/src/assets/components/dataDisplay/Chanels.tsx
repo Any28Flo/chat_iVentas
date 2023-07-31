@@ -17,15 +17,14 @@ type mapProps = {
     index: number
 }
 
-const Chanels = ({ participants, onClick, id }: ChanelProps) => {
+const Chanels = ({ participants, onClick, idChanel }: ChanelProps) => {
 
     return (
-        <>
+        <div key={`${idChanel}`} >
             {
-                participants.map(({ username }) => {
-
+                participants.map(({ username, _id }) => {
                     return (
-                        <Card maxW='md' mb='4' onClick={(e) => onClick(id)} >
+                        <Card key={_id} maxW='md' mb='4' onClick={() => onClick(idChanel)} as=''>
                             <CardHeader>
                                 <Flex spacing='4'>
                                     <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
@@ -45,7 +44,7 @@ const Chanels = ({ participants, onClick, id }: ChanelProps) => {
                     )
                 })
             }
-        </>
+        </div >
     )
 
 }

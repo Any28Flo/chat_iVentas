@@ -2,9 +2,9 @@ import { gql } from "@apollo/client";
 import { User } from "./User";
 import React from "react";
 export interface Chanel {
-  id: string
+  _id: string
   name: string,
-  member: User
+  participants: User[]
 };
 
 export type ChanelType = {
@@ -15,7 +15,7 @@ export type ChanelType = {
 export type ChanelProps = {
   participants: User[],
   onClick: React.MouseEventHandler<HTMLButtonElement>;
-  id: string
+  idChanel: string
 }
 
 
@@ -24,9 +24,10 @@ query getChanels($userId: ID){
   getChanels(userId: $userId){
     chanels{
       name
-      id
+      _id
       participants{
         username
+        _id
       }
     }
     numChanels

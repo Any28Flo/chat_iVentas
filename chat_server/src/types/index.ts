@@ -17,7 +17,7 @@ export const typeDefs = `
     }
     
     type Chanel{
-      id: ID
+      _id: ID
       name: String
       participants: [User]!
     }
@@ -60,9 +60,6 @@ export const typeDefs = `
     
 
     }
-    type Subscription {
-      countdown(from: Int!): Int!
-      messageSent(from:String!):Chat
-    }  
+  
 
     `

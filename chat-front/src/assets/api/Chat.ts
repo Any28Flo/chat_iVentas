@@ -1,18 +1,17 @@
 import { gql } from '@apollo/client';
 
 
-export type Chat = {
+export type ChatType = {
   content: string
   id: string,
   sender: string,
-  receiver: string,
 }
 export type MessageProps = {
-  message: Chat
+  data: ChatType
 }
 
 type Chats = {
-  chats: Chat[]
+  chats: ChatType[]
 }
 
 const GET_MESSAGES_QUERY = gql`
@@ -20,7 +19,7 @@ query getMessages($chanelId : ID){
   getMessages(chanelId:$chanelId){
     sender,
     content
-    created_at
+    id
   }
 }`;
 
@@ -32,5 +31,15 @@ const MESSAGES_SUBSCRIPTION = gql`
     }
   }
 `;
+const SEND_MESSAGE = gql`
 
-export { GET_MESSAGES_QUERY, MESSAGES_SUBSCRIPTION };
+  mutation createMessage($content : String , $sender : ID! , $chanel: ID){
+    createMessage(content:$content, sender:$sender, chanel :$chanel){
+      content
+      id
+      sender
+    }
+    
+  }
+`
+export { GET_MESSAGES_QUERY, MESSAGES_SUBSCRIPTION, SEND_MESSAGE };

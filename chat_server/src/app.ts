@@ -1,5 +1,5 @@
 import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 import express from 'express';
 
 import { compare } from 'bcrypt';
@@ -13,9 +13,17 @@ import config from './utils/config';
 import MessageModel from './models/message.model';
 import ChanelModel from './models/chanel.model';
 import { log } from 'console';
+import Pusher from 'pusher';
 
+import { PubSub } from 'graphql-subscriptions';
 
-const pubSub = createPubSub();
+const pubsub = new PubSub();
+export interface Context {
+  request: any;
+  response: any;
+  connection: any;
+  pusher: Pusher;
+}
 
 export function buildApp(app: ReturnType<typeof express>) {
   const yoga = createYoga({
@@ -42,7 +50,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
               // Find users by their IDs
               //const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
-              const chanels = ChanelModel.aggregate([
+              const chanels = await await ChanelModel.aggregate([
                 {
                   $lookup: {
                     from: 'users',
@@ -53,7 +61,7 @@ export function buildApp(app: ReturnType<typeof express>) {
                           $expr: {
                             $and: [
                               { $in: ['$_id', '$$participants'] },
-                              { $ne: ['$_id', new mongoose.Types.ObjectId(userId)] },
+                              { $ne: ['$_id', new Types.ObjectId(userId)] },
                             ],
                           },
                         },
@@ -73,6 +81,15 @@ export function buildApp(app: ReturnType<typeof express>) {
                     // Other fields from the channels collection can be included in the $group stage if needed
                   },
                 },
+                {
+                  $project: {
+
+                    name: 1,
+                    participants: 1,
+                  },
+                },
+
+
               ]);
 
               return {
@@ -87,35 +104,31 @@ export function buildApp(app: ReturnType<typeof express>) {
           },
           getMessages: async (_, { chanelId, sortBy = 'des' }) => {
             const sort = sortBy === 'des' ? -1 : 1;
-            const messages = await MessageModel.find({ chanel: chanelId }).sort({ createdAt: sort })
+            const messages = await MessageModel.find({ chanel: chanelId }).sort({ createdAt: sort }).limit(20);
             log(messages)
             return messages
           }
         },
         Mutation: {
-          createMessage: async (_, args, context) => {
-            const { content, sender, receiver, chanel } = args;
+          createMessage: async (_, args, context: Context) => {
+            const { content, sender, chanel } = args;
+            log(args)
             const message = new MessageModel({
               content,
               sender,
-              receiver,
               chanel
             })
-            try {
 
-              const messageSaved = await message.save();
-              /*pusher.trigger("my-channel", "create-message", {
-                content: content
-              });*/
 
-              return messageSaved
+            const messageSaved = await message.save();
 
-            } catch (error) {
-              console.log(error);
+            //await pusher.trigger('my-channel', 'client-new-message', { message: content })
+            // pusher.trigger('my-channel', 'client-new-message', args);
+            // context.pusher.trigger('my-channel', 'client-new-message', args);
 
-              throw new Error('Error create message');
+            pusher.trigger('my-channel', 'new-message', messageSaved)
+            return messageSaved
 
-            }
             // pubSub.publish('my-channel', { messageSent: chat })
 
           },
@@ -129,7 +142,7 @@ export function buildApp(app: ReturnType<typeof express>) {
              * - Add error handler
              * 
              */
-            pubSub.publish("newUser", { newUser: user });
+            //  pubSub.publish("newUser", { newUser: user });
             return userDB;
           },
           login: async (_, args, context) => {
@@ -138,7 +151,7 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             try {
               const user = await UserModel.findOne({ email });
-              console.log(user)
+
               if (!user) {
                 throw new Error('Invalid email or password');
               }
@@ -203,17 +216,10 @@ export function buildApp(app: ReturnType<typeof express>) {
           },
 
         },
-        Subscription: {
-          messageSent: {
-            subscribe: (_, args, { from, message, id }, info) => pubSub.subscribe('my-channel'),
 
-          }
-        }
       }
     }),
-    context: ({ request }) => {
-      request
-    }
+
   })
   app.use(yoga.graphqlEndpoint, yoga);
 
