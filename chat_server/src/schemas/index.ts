@@ -1,8 +1,9 @@
 const typeDefs = `
   type Chat {
     id: Int!
-    from: String!
-    message: String!
+    sender: ID
+    content: String
+    chanel: ID
   }
 
   type Query {
