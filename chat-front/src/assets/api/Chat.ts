@@ -31,6 +31,15 @@ const MESSAGES_SUBSCRIPTION = gql`
     }
   }
 `;
+const NEW_MESSAGE_SUBSCRIPTION = gql`
+  subscription {
+    newMessage {
+      id
+      content
+      sender
+    }
+  }
+`;
 const SEND_MESSAGE = gql`
 
   mutation createMessage($content : String , $sender : ID! , $chanel: ID){
@@ -42,4 +51,4 @@ const SEND_MESSAGE = gql`
     
   }
 `
-export { GET_MESSAGES_QUERY, MESSAGES_SUBSCRIPTION, SEND_MESSAGE };
+export { GET_MESSAGES_QUERY, MESSAGES_SUBSCRIPTION, SEND_MESSAGE, NEW_MESSAGE_SUBSCRIPTION };
