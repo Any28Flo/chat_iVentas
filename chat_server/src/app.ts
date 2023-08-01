@@ -1,4 +1,8 @@
-import { createYoga, createSchema, createPubSub, } from 'graphql-yoga';
+import {
+  createYoga, createSchema, createPubSub,
+} from 'graphql-yoga';
+import { YogaInitialContext } from '@graphql-yoga/node'
+
 import { Types } from 'mongoose';
 import express from 'express';
 
@@ -13,17 +17,26 @@ import config from './utils/config';
 import MessageModel from './models/message.model';
 import ChanelModel from './models/chanel.model';
 import { log } from 'console';
-import Pusher from 'pusher';
+import { subscribe } from 'diagnostics_channel';
+import { resolve } from 'path';
 
-import { PubSub } from 'graphql-subscriptions';
-
-const pubsub = new PubSub();
-export interface Context {
-  request: any;
-  response: any;
-  connection: any;
-  pusher: Pusher;
+type User = {
+  username: String
 }
+export type GraphQLContext = {
+  //prisma: PrismaClient
+  //currentUser: null | User
+  pubSub: typeof pubSub
+}
+type Chat = {
+  content: String
+}
+
+const pubSub = createPubSub<{
+  chatMessageCreated: [chatMessageCreated: Chat]
+}>();
+
+
 
 export function buildApp(app: ReturnType<typeof express>) {
   const yoga = createYoga({
@@ -41,16 +54,17 @@ export function buildApp(app: ReturnType<typeof express>) {
           chats(_, __, context) {
             //add method call all messages by idChanel
           },
-          me: (_, __, { currentUser }) => {
+          me: (_, __, { }) => {
             //handle it with sessions
-            return currentUser;
+            //return currentUser;
           },
           getChanels: async (_, { userId }) => {
+
             try {
 
               // Find users by their IDs
-              //const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
-              const chanels = await await ChanelModel.aggregate([
+              const chanels = await ChanelModel.find({ participants: { $in: [userId] } }).populate('participants')
+              /*const chanels = await ChanelModel.aggregate([
                 {
                   $lookup: {
                     from: 'users',
@@ -78,7 +92,7 @@ export function buildApp(app: ReturnType<typeof express>) {
                     _id: '$_id',
                     name: { $first: '$name' },
                     participants: { $push: '$participantsData' },
-                    // Other fields from the channels collection can be included in the $group stage if needed
+                     Other fields from the channels collection can be included in the $group stage if needed
                   },
                 },
                 {
@@ -90,12 +104,12 @@ export function buildApp(app: ReturnType<typeof express>) {
                 },
 
 
-              ]);
+              ]);*/
+              console.log(chanels)
 
               return {
                 chanels: chanels,
                 numChanels: 12
-
               }
 
             } catch (error) {
@@ -110,9 +124,9 @@ export function buildApp(app: ReturnType<typeof express>) {
           }
         },
         Mutation: {
-          createMessage: async (_, args, context: Context) => {
+          createMessage: async (_, args, context: GraphQLContext) => {
             const { content, sender, chanel } = args;
-            log(args)
+
             const message = new MessageModel({
               content,
               sender,
@@ -122,11 +136,14 @@ export function buildApp(app: ReturnType<typeof express>) {
 
             const messageSaved = await message.save();
 
+            pusher.trigger('my-channel', 'new-message', content)
+            pubSub.publish('chatMessageCreated', messageSaved)
+
             //await pusher.trigger('my-channel', 'client-new-message', { message: content })
             // pusher.trigger('my-channel', 'client-new-message', args);
             // context.pusher.trigger('my-channel', 'client-new-message', args);
+            // context.pubSub.publish('new-message', { message: messageSaved })
 
-            pusher.trigger('my-channel', 'new-message', messageSaved)
             return messageSaved
 
             // pubSub.publish('my-channel', { messageSent: chat })
@@ -216,9 +233,16 @@ export function buildApp(app: ReturnType<typeof express>) {
           },
 
         },
+        Subscription: {
+          //chatMessageCreated: (parent: unknown, args: {}, context: GraphQLContext) => context.pubSub.subscribe('chatMessageCreated')
+          chatMessageCreated: {
+            subscribe: (_, args, ctx: GraphQLContext) => pubSub.subscribe("chatMessageCreated"),
+            resolve: payload => payload
+          }
+        }
+      },
 
-      }
-    }),
+    })
 
   })
   app.use(yoga.graphqlEndpoint, yoga);

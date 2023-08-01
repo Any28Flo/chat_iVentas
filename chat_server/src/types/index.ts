@@ -58,6 +58,12 @@ export const typeDefs = `
       
       login(email: String!, password: String!):AuthPayload 
     
+      broadcastRandomNumber: Float!
+
+    }
+    type Subscription {
+
+      chatMessageCreated: Chat
 
     }
   

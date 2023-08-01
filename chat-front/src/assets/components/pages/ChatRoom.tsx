@@ -1,16 +1,16 @@
 
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 
 import { Grid, GridItem } from '@chakra-ui/react';
 
 import AddNewMessage from '../Message/AddNewMessage';
 import { useAppContext } from '../../context/appContext';
 import { Chanel, GET_CHANEL_BY_USER } from '../../api/Chanel';
-import { ChatType } from "../../api/Chat";
+
 import Chanels from '../dataDisplay/Chanels';
 
-import { GET_MESSAGES_QUERY, SEND_MESSAGE } from "../../api/Chat";
+import { GET_MESSAGES_QUERY, NEW_MESSAGE_SUBSCRIPTION, SEND_MESSAGE } from "../../api/Chat";
 import Chat from "../dataDisplay/Chat";
 
 
@@ -22,34 +22,42 @@ const ChatRoom = () => {
 
     const { user } = useAppContext();
 
+    console.log(user);
 
     const [chanelActive, setChanelActive] = useState<chanelActiveType>('');
     const [messages, setMessages] = useState([]);
 
 
-    const { loading, error, data: chanelData } = useQuery(GET_CHANEL_BY_USER, {
+    const { data: chanelData } = useQuery(GET_CHANEL_BY_USER, {
         variables: { userId: user.id }
     });
 
-    const { loading: loadMsg, error: errorsMsg, data: chatsData, refetch } = useQuery(GET_MESSAGES_QUERY, {
+    const { data: chatsData, refetch } = useQuery(GET_MESSAGES_QUERY, {
         variables: { chanelId: chanelActive }
 
     });
     const [sendMessage, { data }] = useMutation(SEND_MESSAGE);
+
+    const { data: newMessageData } = useSubscription(NEW_MESSAGE_SUBSCRIPTION);
 
 
     const handleSend = (data: string) => {
         sendMessage({
             variables: { content: data, sender: user.id, chanel: chanelActive }
         })
-        //setMessages((prev) => prev + 1);
 
     }
-    console.log(chatsData);
 
     const handleClick = (idChanel: string) => {
         setChanelActive(idChanel)
     }
+    useEffect(() => {
+        if (newMessageData) {
+            // Handle new messages here
+            console.log('New Message:', newMessageData.newMessage);
+        }
+    }, [newMessageData]);
+
 
     useEffect(() => {
         if (chanelActive !== '') {
@@ -62,10 +70,9 @@ const ChatRoom = () => {
     useEffect(() => {
 
 
-        const pusher = new Pusher('', {
-            cluster: ''
+        const pusher = new Pusher(import.meta.env.VITE_APP_PUSHER_APP_ID, {
+            cluster: 'us2'
         });
-
         const channel = pusher.subscribe('my-channel');
         console.log(channel);
         Pusher.logToConsole = true;
@@ -79,6 +86,7 @@ const ChatRoom = () => {
             pusher.disconnect();
         };
     }, [])
+    if (loading) return <p>Loading...</p>;
 
     return (
         <Grid
@@ -112,7 +120,7 @@ const ChatRoom = () => {
 
                                         return <Chat key={`message-${idx}`} data={message} />
                                     })
-                                    : ""
+                                    : "Aún no tienes mensajes"
                             }
                             {
                                 <AddNewMessage onSend={handleSend} />
@@ -121,12 +129,7 @@ const ChatRoom = () => {
 
                         </>
                         : ""
-
                 }
-
-
-
-
             </GridItem>
         </Grid >
     )
